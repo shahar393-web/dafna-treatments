@@ -48,6 +48,17 @@ function dt_register_widget_assets() {
 .dtt-txt{display:flex;flex-direction:column;min-width:0;flex:1}
 .dtt-ic{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;border-style:solid;transition:background-color .3s,color .3s}
 .dtt-ic svg{width:var(--dtt-ics,16px);height:var(--dtt-ics,16px);stroke:currentColor;fill:none}
+/* כרטיסי טיפולים: תמונה למעלה, לוח טקסט מזכוכית מתחת, צל שמבליט את הכרטיס */
+.dtk{display:grid;grid-template-columns:repeat(var(--dtk-cols,3),minmax(0,1fr))}
+.dtk-card{position:relative;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:inherit;min-width:0;background:#fff;transition:transform .4s ease,box-shadow .4s ease}
+.dtk.is-lift .dtk-card:hover{transform:translateY(-4px)}
+.dtk-img{display:block;position:relative;width:100%;aspect-ratio:3/2;overflow:hidden}
+.dtk-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none;transition:transform .6s ease}
+.dtk.is-zoom .dtk-card:hover .dtk-img img{transform:scale(1.04)}
+.dtk-panel{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px}
+.dtk-eb{letter-spacing:.1em;font-size:11px}
+.dtk-title{font-size:20px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.dtk-desc{font-size:14px;line-height:1.6;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 /* המלצות */
 .dtr{display:grid;grid-template-columns:repeat(var(--dtr-cols,2),minmax(0,1fr))}
 .dtr-card{margin:0;display:flex;flex-direction:column}

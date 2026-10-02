@@ -418,6 +418,95 @@ class DT_Faq_Widget extends DT_W_Base {
     }
 }
 
+/* ═══════════════════════════ 7 · כרטיסי טיפולים (זכוכית) ═══════════════════════════ */
+class DT_Treatment_Cards_Widget extends DT_W_Base {
+    public function get_name()  { return 'dt_treatment_cards'; }
+    public function get_title() { return 'Dafna · כרטיסי טיפולים'; }
+    public function get_icon()  { return 'eicon-posts-grid'; }
+
+    protected function register_controls() {
+        $opts = [];
+        foreach (get_posts(['post_type' => DT_CPT, 'numberposts' => -1, 'orderby' => 'menu_order title', 'order' => 'ASC']) as $p) $opts[$p->ID] = get_the_title($p);
+
+        $this->start_controls_section('c', ['label' => 'תוכן']);
+        $this->add_control('note', ['type' => CM::RAW_HTML, 'content_classes' => 'elementor-descriptor',
+            'raw' => 'בוחרים טיפולים מהרשימה — הסדר כאן הוא הסדר באתר (הראשון מימין). העינית, השם והתיאור נמשכים מהטיפול עצמו.']);
+        $this->add_control('ids', ['label' => 'טיפולים', 'type' => CM::SELECT2, 'multiple' => true, 'label_block' => true, 'options' => $opts]);
+        $this->add_control('words', ['label' => 'אורך התיאור (מילים)', 'type' => CM::NUMBER, 'min' => 0, 'max' => 60, 'default' => 12]);
+        $this->add_responsive_control('cols', ['label' => 'עמודות', 'type' => CM::NUMBER, 'min' => 1, 'max' => 4, 'default' => 3, 'tablet_default' => 3, 'mobile_default' => 1,
+            'selectors' => ['{{WRAPPER}} .dtk' => '--dtk-cols:{{VALUE}}']]);
+        $this->add_responsive_control('gap', ['label' => 'רווח בין כרטיסים', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 42], 'tablet_default' => ['unit' => 'px', 'size' => 16], 'mobile_default' => ['unit' => 'px', 'size' => 16],
+            'selectors' => ['{{WRAPPER}} .dtk' => 'gap:{{SIZE}}{{UNIT}}']]);
+        $this->add_control('ratio', ['label' => 'צורת התמונה', 'type' => CM::SELECT, 'default' => '3/2',
+            'options' => ['3/2' => 'רוחב (3:2)', '4/3' => '4:3', '1/1' => 'ריבוע', '4/5' => 'לאורך (4:5)'], 'selectors' => ['{{WRAPPER}} .dtk-img' => 'aspect-ratio:{{VALUE}}']]);
+        $this->end_controls_section();
+
+        $this->start_controls_section('s_card', ['label' => 'כרטיס', 'tab' => CM::TAB_STYLE]);
+        $this->add_control('cbg', ['label' => 'רקע הכרטיס', 'type' => CM::COLOR, 'default' => '#FFFFFF', 'selectors' => ['{{WRAPPER}} .dtk-card' => 'background-color:{{VALUE}}']]);
+        $this->add_responsive_control('r', ['label' => 'פינות', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 12], 'selectors' => ['{{WRAPPER}} .dtk-card' => 'border-radius:{{SIZE}}{{UNIT}}']]);
+        $this->add_group_control(\Elementor\Group_Control_Box_Shadow::get_type(), ['name' => 'sh', 'label' => 'צל (הבלטה)', 'selector' => '{{WRAPPER}} .dtk-card',
+            'fields_options' => ['box_shadow_type' => ['default' => 'yes'], 'box_shadow' => ['default' => ['horizontal' => 0, 'vertical' => 16, 'blur' => 36, 'spread' => -8, 'color' => 'rgba(46,42,36,0.14)']]]]);
+        $this->add_control('sh_h', ['label' => 'צל חזק יותר במעבר עכבר', 'type' => CM::SWITCHER, 'default' => 'yes']);
+        $this->add_control('zoom', ['label' => 'הגדלת התמונה במעבר עכבר', 'type' => CM::SWITCHER, 'default' => 'yes']);
+        $this->end_controls_section();
+
+        $this->start_controls_section('s_panel', ['label' => 'לוח הטקסט (זכוכית)', 'tab' => CM::TAB_STYLE]);
+        $this->add_control('bg', ['label' => 'רקע', 'type' => CM::COLOR, 'default' => 'rgba(255,255,255,0.72)', 'selectors' => ['{{WRAPPER}} .dtk-panel' => 'background-color:{{VALUE}}']]);
+        $this->add_control('blur', ['label' => 'טשטוש הזכוכית', 'type' => CM::SLIDER, 'range' => ['px' => ['min' => 0, 'max' => 60]], 'default' => ['unit' => 'px', 'size' => 24],
+            'selectors' => ['{{WRAPPER}} .dtk-panel' => '-webkit-backdrop-filter:blur({{SIZE}}px);backdrop-filter:blur({{SIZE}}px)']]);
+        $this->add_control('overlap', ['label' => 'חפיפה על התמונה (כדי שהזכוכית תיראה)', 'type' => CM::SLIDER, 'range' => ['px' => ['min' => 0, 'max' => 80]], 'default' => ['unit' => 'px', 'size' => 0],
+            'selectors' => ['{{WRAPPER}} .dtk-panel' => 'margin-top:calc(-1 * {{SIZE}}{{UNIT}})']]);
+        $this->add_control('bt', ['label' => 'קו עליון', 'type' => CM::COLOR, 'default' => 'rgba(255,255,255,0.6)', 'selectors' => ['{{WRAPPER}} .dtk-panel' => 'border-top:1px solid {{VALUE}}']]);
+        $this->add_responsive_control('pp', ['label' => 'ריפוד', 'type' => CM::DIMENSIONS, 'size_units' => ['px'],
+            'default' => ['top' => '16', 'right' => '16', 'bottom' => '14', 'left' => '16', 'unit' => 'px', 'isLinked' => false],
+            'mobile_default' => ['top' => '14', 'right' => '14', 'bottom' => '14', 'left' => '14', 'unit' => 'px', 'isLinked' => false],
+            'selectors' => ['{{WRAPPER}} .dtk-panel' => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}']]);
+        $this->add_responsive_control('ph', ['label' => 'גובה מינימלי (כדי שכל הלוחות יהיו שווים)', 'type' => CM::SLIDER, 'range' => ['px' => ['min' => 0, 'max' => 260]],
+            'default' => ['unit' => 'px', 'size' => 108], 'tablet_default' => ['unit' => 'px', 'size' => 70], 'mobile_default' => ['unit' => 'px', 'size' => 96],
+            'selectors' => ['{{WRAPPER}} .dtk-panel' => 'min-height:{{SIZE}}{{UNIT}}']]);
+        $this->end_controls_section();
+
+        $this->start_controls_section('s_tx', ['label' => 'טקסטים', 'tab' => CM::TAB_STYLE]);
+        $this->add_group_control(GT::get_type(), ['name' => 'eb_t', 'label' => 'עינית', 'selector' => '{{WRAPPER}} .dtk-eb']);
+        $this->add_control('eb_c', ['label' => 'צבע עינית', 'type' => CM::COLOR, 'default' => '#6E675D', 'selectors' => ['{{WRAPPER}} .dtk-eb' => 'color:{{VALUE}}']]);
+        $this->add_group_control(GT::get_type(), ['name' => 'ti_t', 'label' => 'שם הטיפול', 'selector' => '{{WRAPPER}} .dtk-title']);
+        $this->add_control('ti_c', ['label' => 'צבע השם', 'type' => CM::COLOR, 'default' => '#2E2A24', 'selectors' => ['{{WRAPPER}} .dtk-title' => 'color:{{VALUE}}']]);
+        $this->add_group_control(GT::get_type(), ['name' => 'de_t', 'label' => 'תיאור', 'selector' => '{{WRAPPER}} .dtk-desc']);
+        $this->add_control('de_c', ['label' => 'צבע התיאור', 'type' => CM::COLOR, 'default' => '#6E675D', 'selectors' => ['{{WRAPPER}} .dtk-desc' => 'color:{{VALUE}}']]);
+        $this->add_responsive_control('desc_show', ['label' => 'תיאור', 'type' => CM::SELECT, 'default' => '-webkit-box', 'tablet_default' => 'none', 'mobile_default' => '-webkit-box',
+            'options' => ['-webkit-box' => 'מוצג', 'none' => 'מוסתר'], 'selectors' => ['{{WRAPPER}} .dtk-desc' => 'display:{{VALUE}}']]);
+        $this->add_responsive_control('lines', ['label' => 'שורות תיאור (ואז "…")', 'type' => CM::NUMBER, 'min' => 1, 'max' => 8, 'default' => 2,
+            'selectors' => ['{{WRAPPER}} .dtk-desc' => '-webkit-line-clamp:{{VALUE}}']]);
+        $this->add_responsive_control('tx_gap', ['label' => 'רווח בין הטקסטים', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 6], 'selectors' => ['{{WRAPPER}} .dtk-panel' => 'gap:{{SIZE}}{{UNIT}}']]);
+        $this->end_controls_section();
+    }
+
+    protected function render() {
+        $s = $this->get_settings_for_display();
+        $ids = array_filter(array_map('intval', (array) ($s['ids'] ?? [])));
+        if (!$ids) {
+            if (\Elementor\Plugin::$instance->editor->is_edit_mode()) echo '<p>בחרי טיפולים בהגדרות הווידג׳ט.</p>';
+            return;
+        }
+        $cls = 'dtk' . (($s['zoom'] ?? '') === 'yes' ? ' is-zoom' : '') . (($s['sh_h'] ?? '') === 'yes' ? ' is-lift' : '');
+        echo '<div class="' . esc_attr($cls) . '">';
+        foreach ($ids as $id) {
+            if (get_post_type($id) !== DT_CPT || get_post_status($id) !== 'publish') continue;
+            $eb = dt_get($id, 'eyebrow');
+            $desc = (int) $s['words'] ? wp_trim_words(dt_get($id, 'summary'), (int) $s['words'], '…') : '';
+            $img = has_post_thumbnail($id)
+                ? get_the_post_thumbnail($id, 'large', ['loading' => 'lazy', 'alt' => esc_attr(get_the_title($id))])
+                : '';
+            echo '<a class="dtk-card" href="' . esc_url(get_permalink($id)) . '"><span class="dtk-img">' . $img . '</span><span class="dtk-panel">'
+               . ($eb ? '<span class="dtk-eb">' . esc_html($eb) . '</span>' : '')
+               . '<span class="dtk-title">' . esc_html(get_the_title($id)) . '</span>'
+               . ($desc ? '<span class="dtk-desc">' . esc_html($desc) . '</span>' : '')
+               . '</span></a>';
+        }
+        echo '</div>';
+    }
+}
+
 function dt_register_home_widgets($wm) {
-    foreach (['DT_Treatment_Tabs_Widget', 'DT_Before_After_Widget', 'DT_Brands_Widget', 'DT_Certs_Widget', 'DT_Reviews_Widget', 'DT_Faq_Widget'] as $c) $wm->register(new $c());
+    foreach (['DT_Treatment_Tabs_Widget', 'DT_Before_After_Widget', 'DT_Brands_Widget', 'DT_Certs_Widget', 'DT_Reviews_Widget', 'DT_Faq_Widget', 'DT_Treatment_Cards_Widget'] as $c) $wm->register(new $c());
 }
