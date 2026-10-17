@@ -77,7 +77,7 @@ class DT_Treatment_Tabs_Widget extends DT_W_Base {
         $this->add_control('tab_ca', ['label' => 'צבע טאב פעיל', 'type' => CM::COLOR, 'default' => '#2E2A24', 'selectors' => ['{{WRAPPER}} .dtt-tab.is-active' => 'color:{{VALUE}};border-bottom-color:{{VALUE}}']]);
         $this->add_control('tab_wa', ['label' => 'משקל טאב פעיל', 'type' => CM::SELECT, 'default' => '700', 'options' => ['400' => 'רגיל', '600' => 'חצי מודגש', '700' => 'מודגש'],
             'selectors' => ['{{WRAPPER}} .dtt-tab.is-active' => 'font-weight:{{VALUE}}']]);
-        $this->add_control('tab_pb', ['label' => 'רווח טקסט ↔ קו', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 12], 'selectors' => ['{{WRAPPER}} .dtt-tab' => 'padding-bottom:{{SIZE}}{{UNIT}}']]);
+        $this->add_responsive_control('tab_pb', ['label' => 'רווח טקסט ↔ קו', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 12], 'selectors' => ['{{WRAPPER}} .dtt-tab' => 'padding-bottom:{{SIZE}}{{UNIT}}']]);
         $this->end_controls_section();
 
         $this->start_controls_section('s_rows', ['label' => 'שורות הטיפולים', 'tab' => CM::TAB_STYLE]);
@@ -91,6 +91,8 @@ class DT_Treatment_Tabs_Widget extends DT_W_Base {
         $this->add_control('title_sp', ['label' => 'רווח שם ↔ תיאור', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 6], 'selectors' => ['{{WRAPPER}} .dtt-title' => 'margin-bottom:{{SIZE}}{{UNIT}}']]);
         $this->add_group_control(GT::get_type(), ['name' => 'desc_t', 'label' => 'תיאור', 'selector' => '{{WRAPPER}} .dtt-desc']);
         $this->add_control('desc_c', ['label' => 'צבע התיאור', 'type' => CM::COLOR, 'default' => '#6E675D', 'selectors' => ['{{WRAPPER}} .dtt-desc' => 'color:{{VALUE}}']]);
+        $this->add_responsive_control('desc_lines', ['label' => 'שורות תיאור (0 = הכול)', 'type' => CM::NUMBER, 'min' => 0, 'max' => 6,
+            'selectors' => ['{{WRAPPER}} .dtt-desc' => 'display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;-webkit-line-clamp:{{VALUE}}']]);
         $this->add_responsive_control('ic_size', ['label' => 'גודל העיגול', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 46], 'mobile_default' => ['unit' => 'px', 'size' => 40],
             'selectors' => ['{{WRAPPER}} .dtt-ic' => 'width:{{SIZE}}{{UNIT}};height:{{SIZE}}{{UNIT}}']]);
         $this->add_control('ic_c', ['label' => 'צבע העיגול והחץ', 'type' => CM::COLOR, 'default' => '#2E2A24', 'selectors' => ['{{WRAPPER}} .dtt-ic' => 'color:{{VALUE}};border-color:{{VALUE}}']]);
@@ -156,6 +158,8 @@ class DT_Before_After_Widget extends DT_W_Base {
             'selectors' => ['{{WRAPPER}} .dtba-card' => '--dtba-w:{{SIZE}}{{UNIT}}']]);
         $this->add_control('ratio', ['label' => 'יחס כל תמונה', 'type' => CM::SELECT, 'default' => '3/4',
             'options' => ['3/4' => '3:4 (לאורך)', '4/5' => '4:5', '2/3' => '2:3 (גבוה)', '1/1' => 'ריבוע'], 'selectors' => ['{{WRAPPER}} .dtba-frame' => '--dtba-ratio:{{VALUE}}']]);
+        $this->add_responsive_control('frame_h', ['label' => 'גובה התמונות (ריק = לפי היחס)', 'type' => CM::SLIDER, 'size_units' => ['px'], 'range' => ['px' => ['min' => 120, 'max' => 700]],
+            'selectors' => ['{{WRAPPER}} .dtba-frame' => 'aspect-ratio:auto;height:{{SIZE}}{{UNIT}}']]);
         $this->add_responsive_control('pair_gap', ['label' => 'רווח בין לפני לאחרי', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 8], 'selectors' => ['{{WRAPPER}} .dtba-pair' => '--dtba-gap:{{SIZE}}{{UNIT}}']]);
         $this->end_controls_section();
 
@@ -232,6 +236,8 @@ class DT_Brands_Widget extends DT_W_Base {
         $this->end_controls_section();
 
         $this->start_controls_section('s', ['label' => 'עיצוב', 'tab' => CM::TAB_STYLE]);
+        $this->add_control('white', ['label' => 'לוגואים לבנים (על רקע כהה)', 'type' => CM::SWITCHER, 'default' => '',
+            'selectors' => ['{{WRAPPER}} .dtb-logo img' => 'filter:brightness(0) invert(1)']]);
         $this->add_control('op', ['label' => 'שקיפות לוגו', 'type' => CM::SLIDER, 'range' => ['px' => ['min' => .1, 'max' => 1, 'step' => .05]], 'default' => ['size' => .85], 'selectors' => ['{{WRAPPER}} .dtb-logo' => 'opacity:{{SIZE}}']]);
         $this->add_control('op_h', ['label' => 'שקיפות במעבר עכבר', 'type' => CM::SLIDER, 'range' => ['px' => ['min' => .1, 'max' => 1, 'step' => .05]], 'default' => ['size' => 1], 'selectors' => ['{{WRAPPER}} .dtb-logo:hover' => 'opacity:{{SIZE}}']]);
         $this->end_controls_section();
