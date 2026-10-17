@@ -431,7 +431,10 @@ class DT_Treatment_Cards_Widget extends DT_W_Base {
         $this->start_controls_section('c', ['label' => 'תוכן']);
         $this->add_control('note', ['type' => CM::RAW_HTML, 'content_classes' => 'elementor-descriptor',
             'raw' => 'בוחרים טיפולים מהרשימה — הסדר כאן הוא הסדר באתר (הראשון מימין). העינית, השם והתיאור נמשכים מהטיפול עצמו.']);
-        $this->add_control('ids', ['label' => 'טיפולים', 'type' => CM::SELECT2, 'multiple' => true, 'label_block' => true, 'options' => $opts]);
+        $this->add_control('related', ['label' => 'טיפולים נוספים (אוטומטי)', 'type' => CM::SWITCHER, 'default' => '',
+            'description' => 'לעמוד טיפול: מציג טיפולים אחרים לפי הסדר, בלי הטיפול הנוכחי. הרשימה למטה לא בשימוש.']);
+        $this->add_control('count', ['label' => 'כמה טיפולים', 'type' => CM::NUMBER, 'min' => 1, 'max' => 12, 'default' => 4, 'condition' => ['related' => 'yes']]);
+        $this->add_control('ids', ['label' => 'טיפולים', 'type' => CM::SELECT2, 'multiple' => true, 'label_block' => true, 'options' => $opts, 'condition' => ['related!' => 'yes']]);
         $this->add_control('words', ['label' => 'אורך התיאור (מילים)', 'type' => CM::NUMBER, 'min' => 0, 'max' => 60, 'default' => 12]);
         $this->add_responsive_control('cols', ['label' => 'עמודות', 'type' => CM::NUMBER, 'min' => 1, 'max' => 4, 'default' => 3, 'tablet_default' => 3, 'mobile_default' => 1,
             'selectors' => ['{{WRAPPER}} .dtk' => '--dtk-cols:{{VALUE}}']]);
@@ -484,6 +487,10 @@ class DT_Treatment_Cards_Widget extends DT_W_Base {
     protected function render() {
         $s = $this->get_settings_for_display();
         $ids = array_filter(array_map('intval', (array) ($s['ids'] ?? [])));
+        if (($s['related'] ?? '') === 'yes') {
+            $ids = get_posts(['post_type' => DT_CPT, 'numberposts' => max(1, (int) ($s['count'] ?? 4)), 'exclude' => [get_the_ID()],
+                              'orderby' => 'menu_order title', 'order' => 'ASC', 'fields' => 'ids']);
+        }
         if (!$ids) {
             if (\Elementor\Plugin::$instance->editor->is_edit_mode()) echo '<p>בחרי טיפולים בהגדרות הווידג׳ט.</p>';
             return;
