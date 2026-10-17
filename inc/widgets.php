@@ -453,6 +453,9 @@ class DT_Treatment_Cards_Widget extends DT_W_Base {
         $this->start_controls_section('s_card', ['label' => 'כרטיס', 'tab' => CM::TAB_STYLE]);
         $this->add_control('cbg', ['label' => 'רקע הכרטיס', 'type' => CM::COLOR, 'default' => '#FFFFFF', 'selectors' => ['{{WRAPPER}} .dtk-card' => 'background-color:{{VALUE}}']]);
         $this->add_responsive_control('r', ['label' => 'פינות', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 12], 'selectors' => ['{{WRAPPER}} .dtk-card' => 'border-radius:{{SIZE}}{{UNIT}}']]);
+        $this->add_responsive_control('cp', ['label' => 'ריפוד הכרטיס', 'type' => CM::SLIDER, 'range' => ['px' => ['min' => 0, 'max' => 40]], 'selectors' => ['{{WRAPPER}} .dtk-card' => 'padding:{{SIZE}}{{UNIT}}']]);
+        $this->add_responsive_control('ir', ['label' => 'פינות התמונה', 'type' => CM::SLIDER, 'range' => ['px' => ['min' => 0, 'max' => 40]], 'selectors' => ['{{WRAPPER}} .dtk-img' => 'border-radius:{{SIZE}}{{UNIT}}']]);
+        $this->add_responsive_control('ih', ['label' => 'גובה התמונה (ריק = לפי הצורה)', 'type' => CM::SLIDER, 'range' => ['px' => ['min' => 80, 'max' => 600]], 'selectors' => ['{{WRAPPER}} .dtk-img' => 'aspect-ratio:auto;height:{{SIZE}}{{UNIT}}']]);
         $this->add_group_control(\Elementor\Group_Control_Box_Shadow::get_type(), ['name' => 'sh', 'label' => 'צל (הבלטה)', 'selector' => '{{WRAPPER}} .dtk-card',
             'fields_options' => ['box_shadow_type' => ['default' => 'yes'], 'box_shadow' => ['default' => ['horizontal' => 0, 'vertical' => 16, 'blur' => 36, 'spread' => -8, 'color' => 'rgba(46,42,36,0.14)']]]]);
         $this->add_control('sh_h', ['label' => 'צל חזק יותר במעבר עכבר', 'type' => CM::SWITCHER, 'default' => 'yes']);
