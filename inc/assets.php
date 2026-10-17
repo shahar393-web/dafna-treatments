@@ -13,7 +13,7 @@ function dt_register_widget_assets() {
     wp_register_style('dt-widgets', false, [], DT_VER);
     wp_add_inline_style('dt-widgets', <<<CSS
 /* ── פס רץ אינסופי (מותגים · תעודות · לפני ואחרי) ── */
-.dfm{position:relative;overflow:hidden;width:100%}
+.dfm{position:relative;overflow:hidden;width:100%;direction:ltr}
 .dfm.is-fade{-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
 .dfm-track{display:flex;width:max-content;direction:ltr;animation:dfm-run var(--dfm-dur,40s) linear infinite}
 .dfm[data-dir="right"] .dfm-track{animation-direction:reverse}

@@ -14,6 +14,7 @@ function dt_biz_fields() {
         'phone'         => ['טלפון (כמו שיופיע באתר)', '050-000-0000', 'text', ''],
         'whatsapp'      => ['וואטסאפ — מספר', '972500000000', 'text', 'בפורמט בינלאומי, בלי + ובלי מקפים. למשל 972501234567'],
         'whatsapp_text' => ['הודעה מוכנה בוואטסאפ', 'היי דפנה, אשמח לקבוע תור', 'text', ''],
+        'booking'       => ['קביעת תור — קישור', '', 'url', 'הקישור למערכת התורים (Calmark). כל כפתורי "לקביעת תור" מושכים ממנו'],
         'email'         => ['מייל', '', 'email', 'גם הכתובת שאליה נשלחים הטפסים באתר'],
         'instagram'     => ['אינסטגרם — קישור', '', 'url', ''],
         'facebook'      => ['פייסבוק — קישור', '', 'url', ''],
@@ -35,6 +36,7 @@ function dt_biz_url($type) {
     switch ($type) {
         case 'phone':     return 'tel:' . preg_replace('/[^0-9+]/', '', dt_biz('phone'));
         case 'whatsapp':  return 'https://wa.me/' . preg_replace('/\D/', '', dt_biz('whatsapp')) . '?text=' . rawurlencode(dt_biz('whatsapp_text'));
+        case 'booking':   return dt_biz('booking') ?: dt_biz_url('whatsapp');
         case 'email':     return dt_biz('email') ? 'mailto:' . dt_biz('email') : '';
         case 'instagram': return dt_biz('instagram');
         case 'facebook':  return dt_biz('facebook');
@@ -125,6 +127,7 @@ add_action('elementor/dynamic_tags/register', function ($tags) {
             public function get_categories() { return [\Elementor\Modules\DynamicTags\Module::URL_CATEGORY]; }
             protected function register_controls() {
                 $this->add_control('type', ['label' => 'סוג', 'type' => \Elementor\Controls_Manager::SELECT, 'default' => 'whatsapp', 'options' => [
+                    'booking' => 'קביעת תור (Calmark)',
                     'whatsapp' => 'וואטסאפ (עם ההודעה המוכנה)', 'phone' => 'חיוג', 'email' => 'מייל',
                     'instagram' => 'אינסטגרם', 'facebook' => 'פייסבוק', 'address' => 'ניווט לכתובת',
                 ]]);
