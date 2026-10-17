@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Dafna Treatments
  * Description: שכבת נתונים לטיפולים — סוג תוכן "טיפול", טופס עריכה בעברית מחולק לסקשנים, טקסונומיית "תחום", Dynamic Tags וווידג'טים ל-Elementor. התצוגה נבנית ב-Theme Builder בלבד.
- * Version: 2.4.4
+ * Version: 2.4.5
  * Author: Studio (for Dafna)
  * Text Domain: dafna-treatments
  * Plugin URI: https://github.com/shahar393-web/dafna-treatments
@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) exit;
 define('DT_CPT',  'treatment');
 define('DT_TAX',  'treatment_concern');
 define('DT_META', '_dt_');
-define('DT_VER',  '2.4.4');
+define('DT_VER',  '2.4.5');
 // הקבוצה בדף הבית = הטאב שבו הטיפול מופיע
 define('DT_GROUP_TAX', 'treatment_group');
 // העדכונים מגיעים מה-releases של המאגר הזה (סעיף 9)

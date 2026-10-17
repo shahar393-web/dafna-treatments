@@ -446,6 +446,9 @@ class DT_Treatment_Cards_Widget extends DT_W_Base {
             'selectors' => ['{{WRAPPER}} .dtk' => '--dtk-cols:{{VALUE}}']]);
         $this->add_responsive_control('gap', ['label' => 'רווח בין כרטיסים', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 42], 'tablet_default' => ['unit' => 'px', 'size' => 16], 'mobile_default' => ['unit' => 'px', 'size' => 16],
             'selectors' => ['{{WRAPPER}} .dtk' => 'gap:{{SIZE}}{{UNIT}}']]);
+        $this->add_responsive_control('scroll_w', ['label' => 'גלילה הצידה: רוחב כרטיס (ריק = רשת)', 'type' => CM::SLIDER, 'size_units' => ['px'], 'range' => ['px' => ['min' => 160, 'max' => 600]],
+            'selectors' => ['{{WRAPPER}} .dtk' => 'grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:{{SIZE}}{{UNIT}};overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory',
+                            '{{WRAPPER}} .dtk-card' => 'scroll-snap-align:start']]);
         $this->add_control('ratio', ['label' => 'צורת התמונה', 'type' => CM::SELECT, 'default' => '3/2',
             'options' => ['3/2' => 'רוחב (3:2)', '4/3' => '4:3', '1/1' => 'ריבוע', '4/5' => 'לאורך (4:5)'], 'selectors' => ['{{WRAPPER}} .dtk-img' => 'aspect-ratio:{{VALUE}}']]);
         $this->end_controls_section();
