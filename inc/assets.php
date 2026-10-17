@@ -40,6 +40,25 @@ function dt_register_widget_assets() {
 .dtba-frame.is-ccw img{transform:translate(-50%,-50%) rotate(-90deg)}
 .dtba-lbl{position:absolute;bottom:10px;inset-inline-start:10px;line-height:1.4}
 .dtba-cap{display:block}
+.dtba-card.is-lb{cursor:zoom-in}
+.dtba-card.is-lb:focus-visible{outline:1px solid currentColor;outline-offset:4px}
+/* לייטבוקס הזוג: רקע חום, מסגרת שמנת, שתי התמונות זו לצד זו (מובייל: זו מעל זו) */
+.dtlb{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--dtba-lb-bg,rgba(46,42,36,.92));opacity:0;transition:opacity .25s;direction:rtl}
+.dtlb.is-on{opacity:1}
+.dtlb-box{position:relative;background:var(--dtba-lb-fr,#F2F1EC);color:var(--dtba-lb-tx,#2E2A24);border-radius:var(--dtba-lb-r,18px);padding:16px 16px 14px;max-width:min(1100px,100%);max-height:100%;display:flex;flex-direction:column;gap:12px;box-shadow:0 30px 80px -20px rgba(0,0,0,.45)}
+.dtlb-pair{display:flex;gap:10px;min-height:0}
+.dtlb-fig{position:relative;flex:1 1 0;margin:0;min-width:0;display:flex}
+.dtlb-fig img,.dtlb-fig canvas{display:block;width:100%;height:auto;max-height:calc(100vh - 180px);object-fit:contain;border-radius:calc(var(--dtba-lb-r,18px) - 6px);background:rgba(46,42,36,.06)}
+.dtlb-tag{position:absolute;top:10px;inset-inline-start:10px;font:600 12px/1 Assistant,sans-serif;letter-spacing:.06em;padding:6px 12px;border-radius:100px;background:rgba(242,241,236,.92);color:#2E2A24}
+.dtlb-cap{text-align:center;font:400 16px/1.5 Assistant,sans-serif}
+.dtlb-btn{position:absolute;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:1px solid rgba(242,241,236,.5);background:rgba(46,42,36,.35);color:#F2F1EC;cursor:pointer;padding:0;font:300 22px/1 Assistant,sans-serif}
+.dtlb-btn:hover,.dtlb-btn:focus{background:rgba(46,42,36,.6);color:#F2F1EC}
+.dtlb-btn:focus{outline:none}.dtlb-btn:focus-visible{outline:2px solid #F2F1EC;outline-offset:2px}
+.dtlb-x{top:-56px;inset-inline-start:0}
+.dtlb-prev,.dtlb-next{top:50%;transform:translateY(-50%)}
+.dtlb-prev{inset-inline-start:-60px}.dtlb-next{inset-inline-end:-60px}
+@media (max-width:880px){.dtlb{padding:72px 12px 24px}.dtlb-pair{flex-direction:column}.dtlb-fig img,.dtlb-fig canvas{max-height:calc((100vh - 220px)/2)}
+  .dtlb-prev,.dtlb-next{top:auto;bottom:-56px;transform:none}.dtlb-prev{inset-inline-start:calc(50% - 52px)}.dtlb-next{inset-inline-end:calc(50% - 52px)}}
 /* טאבים של טיפולים */
 .dtt-tabs{display:flex;flex-wrap:wrap}
 .dtt-tab{background:none;border:0;border-bottom:1px solid transparent;padding:0;cursor:pointer;font:inherit;color:inherit;border-radius:0;-webkit-tap-highlight-color:transparent}
@@ -93,6 +112,59 @@ CSS);
   }
   function init(root){ (root||document).querySelectorAll('.dtba-frame[data-rot="auto"] img').forEach(rot); }
   if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded',function(){init();});
+  /* לייטבוקס הזוג: לחיצה על כרטיס פותחת את לפני+אחרי בגדול, חצים / מקלדת / החלקה עוברים בין הזוגות */
+  var lb=null, list=[], idx=0, tx=0;
+  function pairs(card){
+    var w=card.closest('.elementor-widget-dt_before_after')||document, seen={}, out=[];
+    w.querySelectorAll('.dtba-card.is-lb').forEach(function(c){
+      var im=c.querySelectorAll('.dtba-img[data-full]'); if(im.length<2) return;
+      var k=im[0].getAttribute('data-full'); if(seen[k]) return; seen[k]=1;
+      var r=function(i){var f=im[i].querySelector('.dtba-frame');return f&&f.classList.contains('is-cw')?90:(f&&f.classList.contains('is-ccw')?-90:0);};
+      out.push({b:k,a:im[1].getAttribute('data-full'),rb:r(0),ra:r(1),t:c.getAttribute('data-t')||'',lb:c.getAttribute('data-lb-b')||'',la:c.getAttribute('data-lb-a')||''});
+    });
+    return out;
+  }
+  function fig(src,tag,deg){ return '<figure class="dtlb-fig"><img src="'+src+'" alt="'+tag+'"'+(deg?' data-deg="'+deg+'"':'')+'>'+(tag?'<span class="dtlb-tag">'+tag+'</span>':'')+'</figure>'; }
+  /* תמונה שמסובבת בכרטיס — מסובבים גם בחלון (ציור על canvas, כך שהגובה/רוחב מתחלפים נכון) */
+  function turn(img){
+    var deg=+img.getAttribute('data-deg'); if(!deg) return;
+    var go=function(){ var c=document.createElement('canvas'); c.width=img.naturalHeight; c.height=img.naturalWidth;
+      var x=c.getContext('2d'); x.translate(c.width/2,c.height/2); x.rotate(deg*Math.PI/180); x.drawImage(img,-img.naturalWidth/2,-img.naturalHeight/2);
+      c.setAttribute('role','img'); c.setAttribute('aria-label',img.alt); img.replaceWith(c); };
+    img.complete&&img.naturalWidth?go():img.addEventListener('load',go,{once:true});
+  }
+  function draw(){
+    var p=list[idx]; if(!p) return;
+    var pr=lb.querySelector('.dtlb-pair'); pr.innerHTML=fig(p.b,p.lb,p.rb)+fig(p.a,p.la,p.ra); pr.querySelectorAll('img[data-deg]').forEach(turn);
+    lb.querySelector('.dtlb-cap').textContent=p.t;
+    lb.querySelectorAll('.dtlb-prev,.dtlb-next').forEach(function(b){b.hidden=list.length<2;});
+  }
+  function go(d){ idx=(idx+d+list.length)%list.length; draw(); }
+  function close(){ if(!lb) return; lb.classList.remove('is-on'); var el=lb; lb=null; document.documentElement.style.overflow=''; setTimeout(function(){el.remove();},250); }
+  function open(card){
+    list=pairs(card); var k=(card.querySelector('.dtba-img[data-full]')||{}).getAttribute&&card.querySelector('.dtba-img[data-full]').getAttribute('data-full');
+    idx=Math.max(0,list.findIndex(function(p){return p.b===k;}));
+    var w=card.closest('.elementor-widget-dt_before_after')||card, cs=getComputedStyle(w);
+    lb=document.createElement('div'); lb.className='dtlb'; lb.setAttribute('role','dialog'); lb.setAttribute('aria-modal','true');
+    ['--dtba-lb-bg','--dtba-lb-fr','--dtba-lb-tx','--dtba-lb-r'].forEach(function(v){var x=cs.getPropertyValue(v); if(x) lb.style.setProperty(v,x.trim());});
+    lb.innerHTML='<div class="dtlb-box"><button type="button" class="dtlb-btn dtlb-x" aria-label="סגירה">×</button>'
+      +'<button type="button" class="dtlb-btn dtlb-prev" aria-label="הקודם">→</button><button type="button" class="dtlb-btn dtlb-next" aria-label="הבא">←</button>'
+      +'<div class="dtlb-pair"></div><div class="dtlb-cap"></div></div>';
+    document.body.appendChild(lb); document.documentElement.style.overflow='hidden'; draw();
+    requestAnimationFrame(function(){lb.classList.add('is-on');}); lb.querySelector('.dtlb-x').focus();
+    lb.addEventListener('click',function(e){
+      if(e.target===lb||e.target.closest('.dtlb-x')) close();
+      else if(e.target.closest('.dtlb-prev')) go(-1);
+      else if(e.target.closest('.dtlb-next')) go(1);
+    });
+    lb.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
+    lb.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx; if(Math.abs(d)>50) go(d>0?1:-1);});
+  }
+  document.addEventListener('click',function(e){ var c=e.target.closest&&e.target.closest('.dtba-card.is-lb'); if(c&&!lb){ e.preventDefault(); open(c); } });
+  document.addEventListener('keydown',function(e){
+    if(!lb){ var c=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.dtba-card.is-lb'); if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();open(c);} return; }
+    if(e.key==='Escape') close(); else if(e.key==='ArrowLeft') go(1); else if(e.key==='ArrowRight') go(-1);
+  });
   /* בעורך של אלמנטור הווידג'ט נטען מחדש בכל שינוי — מאתחלים שוב */
   if(window.jQuery) jQuery(window).on('elementor/frontend/init',function(){
     if(window.elementorFrontend&&elementorFrontend.hooks) elementorFrontend.hooks.addAction('frontend/element_ready/dt_before_after.default',function(s){init(s[0]||s);});

@@ -144,7 +144,7 @@ class DT_Before_After_Widget extends DT_W_Base {
         $r->add_control('rot_b', ['label' => 'סיבוב "לפני"', 'type' => CM::SELECT, 'default' => 'auto', 'options' => $rot]);
         $r->add_control('rot_a', ['label' => 'סיבוב "אחרי"', 'type' => CM::SELECT, 'default' => 'auto', 'options' => $rot]);
         $this->add_control('items', ['label' => 'זוגות', 'type' => CM::REPEATER, 'fields' => $r->get_controls(), 'title_field' => '{{{ title }}}', 'default' => [['title' => 'שם הטיפול']]]);
-        $this->add_control('lightbox', ['label' => 'לחיצה פותחת תמונה גדולה (Lightbox)', 'type' => CM::SWITCHER, 'default' => 'yes']);
+        $this->add_control('lightbox', ['label' => 'לחיצה פותחת את הזוג בגדול (Lightbox)', 'type' => CM::SWITCHER, 'default' => 'yes']);
         $this->add_control('labels', ['label' => 'תוויות "לפני / אחרי"', 'type' => CM::SWITCHER, 'default' => 'yes']);
         $this->add_control('lbl_b', ['label' => 'טקסט "לפני"', 'type' => CM::TEXT, 'default' => 'לפני', 'condition' => ['labels' => 'yes']]);
         $this->add_control('lbl_a', ['label' => 'טקסט "אחרי"', 'type' => CM::TEXT, 'default' => 'אחרי', 'condition' => ['labels' => 'yes']]);
@@ -186,6 +186,14 @@ class DT_Before_After_Widget extends DT_W_Base {
         $this->add_control('lbl_p', ['label' => 'ריפוד', 'type' => CM::DIMENSIONS, 'size_units' => ['px'], 'default' => ['top' => '2', 'right' => '10', 'bottom' => '2', 'left' => '10', 'unit' => 'px', 'isLinked' => false],
             'selectors' => ['{{WRAPPER}} .dtba-lbl' => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};border-radius:100px']]);
         $this->end_controls_section();
+
+        // לייטבוקס הזוג — הערכים נקראים מהווידג'ט ונכנסים לחלון (משתני CSS)
+        $this->start_controls_section('s_lb', ['label' => 'לייטבוקס', 'tab' => CM::TAB_STYLE, 'condition' => ['lightbox' => 'yes']]);
+        $this->add_control('lb_bg', ['label' => 'רקע מאחור', 'type' => CM::COLOR, 'default' => 'rgba(46,42,36,.92)', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-bg:{{VALUE}}']]);
+        $this->add_control('lb_fr', ['label' => 'מסגרת', 'type' => CM::COLOR, 'default' => '#F2F1EC', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-fr:{{VALUE}}']]);
+        $this->add_control('lb_tx', ['label' => 'צבע הטקסט', 'type' => CM::COLOR, 'default' => '#2E2A24', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-tx:{{VALUE}}']]);
+        $this->add_control('lb_r', ['label' => 'פינות', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 18], 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-r:{{SIZE}}{{UNIT}}']]);
+        $this->end_controls_section();
     }
 
     protected function img($m, $rot, $label, $title, $s, $group) {
@@ -194,11 +202,10 @@ class DT_Before_After_Widget extends DT_W_Base {
         $full = $id ? wp_get_attachment_image_url($id, 'full') : $url;
         $img  = $id ? wp_get_attachment_image($id, 'large', false, ['alt' => esc_attr($title . ' · ' . $label), 'loading' => 'lazy']) : '<img src="' . esc_url($url) . '" alt="' . esc_attr($title) . '" loading="lazy">';
         $cls  = $rot === 'cw' ? ' is-cw' : ($rot === 'ccw' ? ' is-ccw' : '');
-        $lb   = ($s['lightbox'] ?? '') === 'yes';
-        $tag  = $lb ? 'a' : 'span';
-        $att  = $lb ? ' href="' . esc_url($full) . '" data-elementor-open-lightbox="yes" data-elementor-lightbox-slideshow="' . esc_attr($group) . '" data-elementor-lightbox-title="' . esc_attr($title . ' · ' . $label) . '"' : '';
+        // לייטבוקס זוגי (2.4.8): כל הכרטיס נפתח — כאן רק שומרים את כתובת התמונה המלאה
+        $att  = ($s['lightbox'] ?? '') === 'yes' ? ' data-full="' . esc_url($full) . '"' : '';
         $lbl  = ($s['labels'] ?? '') === 'yes' ? '<span class="dtba-lbl">' . esc_html($label) . '</span>' : '';
-        return '<' . $tag . ' class="dtba-img"' . $att . '><span class="dtba-frame' . $cls . '" data-rot="' . esc_attr($rot) . '">' . $img . '</span>' . $lbl . '</' . $tag . '>';
+        return '<span class="dtba-img"' . $att . '><span class="dtba-frame' . $cls . '" data-rot="' . esc_attr($rot) . '">' . $img . '</span>' . $lbl . '</span>';
     }
 
     protected function render() {
@@ -207,7 +214,9 @@ class DT_Before_After_Widget extends DT_W_Base {
         $html = '';
         foreach ((array) ($s['items'] ?? []) as $it) {
             $t = $it['title'] ?? '';
-            $html .= '<figure class="dtba-card"><div class="dtba-pair">'
+            $lb = ($s['lightbox'] ?? '') === 'yes';
+            $html .= '<figure class="dtba-card' . ($lb ? ' is-lb' : '') . '"' . ($lb ? ' role="button" tabindex="0" aria-label="' . esc_attr(($t ?: 'לפני ואחרי') . ' · הגדלה') . '"'
+                   . ' data-t="' . esc_attr($t) . '" data-lb-b="' . esc_attr($s['lbl_b'] ?? 'לפני') . '" data-lb-a="' . esc_attr($s['lbl_a'] ?? 'אחרי') . '"' : '') . '><div class="dtba-pair">'
                    . $this->img($it['before'] ?? [], $it['rot_b'] ?? 'auto', $s['lbl_b'] ?? 'לפני', $t, $s, $group)
                    . $this->img($it['after'] ?? [], $it['rot_a'] ?? 'auto', $s['lbl_a'] ?? 'אחרי', $t, $s, $group)
                    . '</div>' . ($t !== '' ? '<figcaption class="dtba-cap">' . esc_html($t) . '</figcaption>' : '') . '</figure>';
