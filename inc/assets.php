@@ -42,7 +42,10 @@ function dt_register_widget_assets() {
 .dtba-cap{display:block}
 /* טאבים של טיפולים */
 .dtt-tabs{display:flex;flex-wrap:wrap}
-.dtt-tab{background:none;border:0;border-bottom:1px solid transparent;padding:0;cursor:pointer;font:inherit;color:inherit}
+.dtt-tab{background:none;border:0;border-bottom:1px solid transparent;padding:0;cursor:pointer;font:inherit;color:inherit;border-radius:0;-webkit-tap-highlight-color:transparent}
+/* ערכת Hello צובעת כל button בוורוד (#c36) במעבר/מיקוד — הטאב נשאר שקוף בכל מצב */
+.dtt .dtt-tab:hover,.dtt .dtt-tab:focus,.dtt .dtt-tab:active,.dtt .dtt-tab.is-active{background:none;box-shadow:none;outline:0}
+.dtt .dtt-tab:focus-visible{outline:1px solid currentColor;outline-offset:4px}
 .dtt-panel[hidden]{display:none}
 .dtt-row{display:flex;align-items:center;justify-content:space-between;text-decoration:none;color:inherit}
 .dtt-txt{display:flex;flex-direction:column;min-width:0;flex:1}
