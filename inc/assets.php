@@ -51,8 +51,9 @@ function dt_register_widget_assets() {
 .dtlb-fig img,.dtlb-fig canvas{display:block;width:100%;height:auto;max-height:calc(100vh - 180px);object-fit:contain;border-radius:calc(var(--dtba-lb-r,18px) - 6px);background:rgba(46,42,36,.06)}
 .dtlb-tag{position:absolute;top:10px;inset-inline-start:10px;font:600 12px/1 Assistant,sans-serif;letter-spacing:.06em;padding:6px 12px;border-radius:100px;background:rgba(242,241,236,.92);color:#2E2A24}
 .dtlb-cap{text-align:center;font:400 16px/1.5 Assistant,sans-serif}
-.dtlb-btn{position:absolute;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:1px solid rgba(242,241,236,.5);background:rgba(46,42,36,.35);color:#F2F1EC;cursor:pointer;padding:0;font:300 22px/1 Assistant,sans-serif}
-.dtlb-btn:hover,.dtlb-btn:focus{background:rgba(46,42,36,.6);color:#F2F1EC}
+.dtlb-btn{position:absolute;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:1px solid rgba(242,241,236,.5);background:transparent;color:#F2F1EC;cursor:pointer;padding:0;transition:background .3s,color .3s,border-color .3s}
+.dtlb-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.dtlb-btn:hover,.dtlb-btn:focus{background:#F2F1EC;color:#2E2A24;border-color:#F2F1EC}
 .dtlb-btn:focus{outline:none}.dtlb-btn:focus-visible{outline:2px solid #F2F1EC;outline-offset:2px}
 .dtlb-x{top:-56px;inset-inline-start:0}
 .dtlb-prev,.dtlb-next{top:50%;transform:translateY(-50%)}
@@ -147,8 +148,8 @@ CSS);
     var w=card.closest('.elementor-widget-dt_before_after')||card, cs=getComputedStyle(w);
     lb=document.createElement('div'); lb.className='dtlb'; lb.setAttribute('role','dialog'); lb.setAttribute('aria-modal','true');
     ['--dtba-lb-bg','--dtba-lb-fr','--dtba-lb-tx','--dtba-lb-r'].forEach(function(v){var x=cs.getPropertyValue(v); if(x) lb.style.setProperty(v,x.trim());});
-    lb.innerHTML='<div class="dtlb-box"><button type="button" class="dtlb-btn dtlb-x" aria-label="סגירה">×</button>'
-      +'<button type="button" class="dtlb-btn dtlb-prev" aria-label="הקודם">→</button><button type="button" class="dtlb-btn dtlb-next" aria-label="הבא">←</button>'
+    lb.innerHTML='<div class="dtlb-box"><button type="button" class="dtlb-btn dtlb-x" aria-label="סגירה"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
+      +'<button type="button" class="dtlb-btn dtlb-prev" aria-label="הקודם"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg></button><button type="button" class="dtlb-btn dtlb-next" aria-label="הבא"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12H4M10 6l-6 6 6 6"/></svg></button>'
       +'<div class="dtlb-pair"></div><div class="dtlb-cap"></div></div>';
     document.body.appendChild(lb); document.documentElement.style.overflow='hidden'; draw();
     requestAnimationFrame(function(){lb.classList.add('is-on');}); lb.querySelector('.dtlb-x').focus();
