@@ -53,7 +53,7 @@ function dt_register_widget_assets() {
 .dtlb-cap{text-align:center;font:400 16px/1.5 Assistant,sans-serif}
 .dtlb-btn{position:absolute;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:1px solid rgba(242,241,236,.5);background:transparent;color:#F2F1EC;cursor:pointer;padding:0;transition:background .3s,color .3s,border-color .3s}
 .dtlb-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
-.dtlb-btn:hover,.dtlb-btn:focus{background:#F2F1EC;color:#2E2A24;border-color:#F2F1EC}
+.dtlb-btn:hover{background:#F2F1EC;color:#2E2A24;border-color:#F2F1EC}
 .dtlb-btn:focus{outline:none}.dtlb-btn:focus-visible{outline:2px solid #F2F1EC;outline-offset:2px}
 .dtlb-x{top:-56px;inset-inline-start:0}
 .dtlb-prev,.dtlb-next{top:50%;transform:translateY(-50%)}
