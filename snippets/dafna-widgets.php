@@ -214,8 +214,9 @@ CSS);
     var grid=id?document.querySelector('.elementor-element-'+id):(w&&w.parentElement.querySelector('.elementor-widget-loop-grid'));
     if(!grid) return;
     bar.querySelectorAll('.dtf-b').forEach(function(x){var on=x===b;x.classList.toggle('is-on',on);x.setAttribute('aria-pressed',on?'true':'false');});
-    var cat=b.getAttribute('data-cat');
-    grid.querySelectorAll('.e-loop-item').forEach(function(it){ it.style.display=(!cat||it.classList.contains('product_cat-'+cat))?'':'none'; });
+    var cat=b.getAttribute('data-cat'), tid=b.getAttribute('data-id');
+    /* וורדפרס מסמן קטגוריה בעברית לפי המספר שלה (product_cat-46), ובאנגלית לפי השם */
+    grid.querySelectorAll('.e-loop-item').forEach(function(it){ var ok=!cat||it.classList.contains('product_cat-'+cat)||(tid&&it.classList.contains('product_cat-'+tid)); it.style.display=ok?'':'none'; });
   });
   function fillAll(){ document.querySelectorAll('.dfm').forEach(fill); }
   window.addEventListener('load',fillAll); window.addEventListener('resize',fillAll);
@@ -816,7 +817,7 @@ class DTS_Cat_Filter_Widget extends DTS_W_Base {
         if (is_wp_error($kids) || !$kids) return;
         echo '<div class="dtf" role="toolbar" data-target="' . esc_attr($s['target'] ?? '') . '">';
         echo '<button type="button" class="dtf-b is-on" data-cat="" aria-pressed="true">' . esc_html(($s['all'] ?? '') ?: 'הכל') . '</button>';
-        foreach ($kids as $k) echo '<button type="button" class="dtf-b" data-cat="' . esc_attr($k->slug) . '" aria-pressed="false">' . esc_html($k->name) . '</button>';
+        foreach ($kids as $k) echo '<button type="button" class="dtf-b" data-cat="' . esc_attr($k->slug) . '" data-id="' . (int) $k->term_id . '" aria-pressed="false">' . esc_html($k->name) . '</button>';
         echo '</div>';
     }
 }

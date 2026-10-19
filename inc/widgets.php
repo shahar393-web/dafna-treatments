@@ -588,7 +588,7 @@ class DT_Cat_Filter_Widget extends DT_W_Base {
         if (is_wp_error($kids) || !$kids) return;
         echo '<div class="dtf" role="toolbar" data-target="' . esc_attr($s['target'] ?? '') . '">';
         echo '<button type="button" class="dtf-b is-on" data-cat="" aria-pressed="true">' . esc_html(($s['all'] ?? '') ?: 'הכל') . '</button>';
-        foreach ($kids as $k) echo '<button type="button" class="dtf-b" data-cat="' . esc_attr($k->slug) . '" aria-pressed="false">' . esc_html($k->name) . '</button>';
+        foreach ($kids as $k) echo '<button type="button" class="dtf-b" data-cat="' . esc_attr($k->slug) . '" data-id="' . (int) $k->term_id . '" aria-pressed="false">' . esc_html($k->name) . '</button>';
         echo '</div>';
     }
 }

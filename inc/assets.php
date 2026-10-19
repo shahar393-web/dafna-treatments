@@ -198,8 +198,9 @@ CSS);
     var grid=id?document.querySelector('.elementor-element-'+id):(w&&w.parentElement.querySelector('.elementor-widget-loop-grid'));
     if(!grid) return;
     bar.querySelectorAll('.dtf-b').forEach(function(x){var on=x===b;x.classList.toggle('is-on',on);x.setAttribute('aria-pressed',on?'true':'false');});
-    var cat=b.getAttribute('data-cat');
-    grid.querySelectorAll('.e-loop-item').forEach(function(it){ it.style.display=(!cat||it.classList.contains('product_cat-'+cat))?'':'none'; });
+    var cat=b.getAttribute('data-cat'), tid=b.getAttribute('data-id');
+    /* וורדפרס מסמן קטגוריה בעברית לפי המספר שלה (product_cat-46), ובאנגלית לפי השם */
+    grid.querySelectorAll('.e-loop-item').forEach(function(it){ var ok=!cat||it.classList.contains('product_cat-'+cat)||(tid&&it.classList.contains('product_cat-'+tid)); it.style.display=ok?'':'none'; });
   });
   function fillAll(){ document.querySelectorAll('.dfm').forEach(fill); }
   window.addEventListener('load',fillAll); window.addEventListener('resize',fillAll);
