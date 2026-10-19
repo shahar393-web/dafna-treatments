@@ -158,6 +158,9 @@ class DT_Before_After_Widget extends DT_W_Base {
             'selectors' => ['{{WRAPPER}} .dtba-card' => '--dtba-w:{{SIZE}}{{UNIT}}']]);
         $this->add_control('ratio', ['label' => 'יחס כל תמונה', 'type' => CM::SELECT, 'default' => '3/4',
             'options' => ['3/4' => '3:4 (לאורך)', '4/5' => '4:5', '2/3' => '2:3 (גבוה)', '1/1' => 'ריבוע'], 'selectors' => ['{{WRAPPER}} .dtba-frame' => '--dtba-ratio:{{VALUE}}']]);
+        $this->add_control('fit', ['label' => 'התאמת התמונה', 'type' => CM::SELECT, 'default' => 'blur',
+            'options' => ['blur' => 'כל התמונה + רקע מטושטש', 'cover' => 'ממלאת את המסגרת (נחתכת)'], 'selectors_dictionary' => ['blur' => 'contain', 'cover' => 'cover'],
+            'selectors' => ['{{WRAPPER}} .dtba-main' => 'object-fit:{{VALUE}}']]);
         $this->add_responsive_control('frame_h', ['label' => 'גובה התמונות (ריק = לפי היחס)', 'type' => CM::SLIDER, 'size_units' => ['px'], 'range' => ['px' => ['min' => 120, 'max' => 700]],
             'selectors' => ['{{WRAPPER}} .dtba-frame' => 'aspect-ratio:auto;height:{{SIZE}}{{UNIT}}']]);
         $this->add_responsive_control('pair_gap', ['label' => 'רווח בין לפני לאחרי', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 8], 'selectors' => ['{{WRAPPER}} .dtba-pair' => '--dtba-gap:{{SIZE}}{{UNIT}}']]);
@@ -200,12 +203,14 @@ class DT_Before_After_Widget extends DT_W_Base {
         $id = (int) ($m['id'] ?? 0); $url = $m['url'] ?? '';
         if (!$id && !$url) return '';
         $full = $id ? wp_get_attachment_image_url($id, 'full') : $url;
-        $img  = $id ? wp_get_attachment_image($id, 'large', false, ['alt' => esc_attr($title . ' · ' . $label), 'loading' => 'lazy']) : '<img src="' . esc_url($url) . '" alt="' . esc_attr($title) . '" loading="lazy">';
+        $img  = $id ? wp_get_attachment_image($id, 'large', false, ['alt' => esc_attr($title . ' · ' . $label), 'loading' => 'lazy', 'class' => 'dtba-main']) : '<img class="dtba-main" src="' . esc_url($url) . '" alt="' . esc_attr($title) . '" loading="lazy">';
+        // כל התמונה נראית (contain) בתוך מסגרת קבועה; מאחוריה אותה תמונה מטושטשת ממלאת את השוליים
+        $bg   = ($s['fit'] ?? 'blur') === 'blur' ? '<img class="dtba-bg" src="' . esc_url($id ? wp_get_attachment_image_url($id, 'medium') : $url) . '" alt="" aria-hidden="true" loading="lazy">' : '';
         $cls  = $rot === 'cw' ? ' is-cw' : ($rot === 'ccw' ? ' is-ccw' : '');
         // לייטבוקס זוגי (2.4.8): כל הכרטיס נפתח — כאן רק שומרים את כתובת התמונה המלאה
         $att  = ($s['lightbox'] ?? '') === 'yes' ? ' data-full="' . esc_url($full) . '"' : '';
         $lbl  = ($s['labels'] ?? '') === 'yes' ? '<span class="dtba-lbl">' . esc_html($label) . '</span>' : '';
-        return '<span class="dtba-img"' . $att . '><span class="dtba-frame' . $cls . '" data-rot="' . esc_attr($rot) . '">' . $img . '</span>' . $lbl . '</span>';
+        return '<span class="dtba-img"' . $att . '><span class="dtba-frame' . $cls . '" data-rot="' . esc_attr($rot) . '">' . $bg . $img . '</span>' . $lbl . '</span>';
     }
 
     protected function render() {

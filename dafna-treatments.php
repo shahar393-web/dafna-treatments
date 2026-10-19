@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Dafna Treatments
  * Description: שכבת נתונים לטיפולים — סוג תוכן "טיפול", טופס עריכה בעברית מחולק לסקשנים, טקסונומיית "תחום", Dynamic Tags וווידג'טים ל-Elementor. התצוגה נבנית ב-Theme Builder בלבד.
- * Version: 2.5.0
+ * Version: 2.6.0
  * Author: Studio (for Dafna)
  * Text Domain: dafna-treatments
  * Plugin URI: https://github.com/shahar393-web/dafna-treatments
@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) exit;
 define('DT_CPT',  'treatment');
 define('DT_TAX',  'treatment_concern');
 define('DT_META', '_dt_');
-define('DT_VER',  '2.5.0');
+define('DT_VER',  '2.6.0');
 // הקבוצה בדף הבית = הטאב שבו הטיפול מופיע
 define('DT_GROUP_TAX', 'treatment_group');
 // העדכונים מגיעים מה-releases של המאגר הזה (סעיף 9)
@@ -419,12 +419,17 @@ add_action('elementor/widgets/register', function ($wm) {
    ═══════════════════════════════════════════════════════════════════════ */
 require_once __DIR__ . '/inc/business.php';
 require_once __DIR__ . '/inc/faq.php';
-require_once __DIR__ . '/inc/assets.php';
-add_action('elementor/widgets/register', function ($wm) {
-    if (!class_exists('\Elementor\Widget_Base')) return;
-    require_once __DIR__ . '/inc/widgets.php';
-    dt_register_home_widgets($wm);
-}, 25);
+/* 2.6.0 — הווידג'טים עוברים לסניפט "Dafna · ווידג'טים" (Code Snippets), כדי שאפשר לערוך אותם מהאתר בלי להעלות גרסה.
+   כשהסניפט פעיל הוא מגדיר DT_WIDGETS_SNIPPET והתוסף לא טוען את העותק שלו (אחרת — כמו קודם). */
+add_action('init', function () {
+    if (defined('DT_WIDGETS_SNIPPET')) return;
+    require_once __DIR__ . '/inc/assets.php';
+    add_action('elementor/widgets/register', function ($wm) {
+        if (!class_exists('\Elementor\Widget_Base')) return;
+        require_once __DIR__ . '/inc/widgets.php';
+        dt_register_home_widgets($wm);
+    }, 25);
+}, 1);
 
 /* ═══════════════════════════════════════════════════════════════════════
    9 · עדכונים מ-GitHub — "קיימת גרסה חדשה" במסך התוספים, כמו כל תוסף

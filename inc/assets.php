@@ -17,7 +17,7 @@ function dt_register_widget_assets() {
 .dfm.is-fade{-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
 .dfm-track{display:flex;width:max-content;direction:ltr;animation:dfm-run var(--dfm-dur,40s) linear infinite}
 .dfm[data-dir="right"] .dfm-track{animation-direction:reverse}
-.dfm.is-pause:hover .dfm-track{animation-play-state:paused}
+@media (hover:hover){.dfm.is-pause:hover .dfm-track{animation-play-state:paused}}
 .dfm-set{display:flex;align-items:center;gap:var(--dfm-gap,32px);padding-inline-end:var(--dfm-gap,32px)}
 .dfm-set>*{direction:rtl;flex:0 0 auto}
 @keyframes dfm-run{to{transform:translateX(var(--dfm-to,-50%))}}
@@ -34,10 +34,12 @@ function dt_register_widget_assets() {
 .dtba-pair{display:flex;gap:var(--dtba-gap,8px)}
 .dtba-img{position:relative;flex:1 1 0;display:block;min-width:0}
 .dtba-frame{display:block;position:relative;aspect-ratio:var(--dtba-ratio,3/4);overflow:hidden;container-type:size}
-.dtba-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none}
-.dtba-frame.is-cw img,.dtba-frame.is-ccw img{inset:auto;top:50%;left:50%;width:100cqh;height:100cqw}
-.dtba-frame.is-cw img{transform:translate(-50%,-50%) rotate(90deg)}
-.dtba-frame.is-ccw img{transform:translate(-50%,-50%) rotate(-90deg)}
+.dtba-frame{background:#2E2A24}
+.dtba-frame img.dtba-main{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;max-width:none;z-index:1}
+.dtba-bg{position:absolute;inset:-10%;width:120%;height:120%;max-width:none;object-fit:cover;filter:blur(18px);opacity:.9}
+.dtba-frame.is-cw img.dtba-main,.dtba-frame.is-ccw img.dtba-main{inset:auto;top:50%;left:50%;width:100cqh;height:100cqw}
+.dtba-frame.is-cw img.dtba-main{transform:translate(-50%,-50%) rotate(90deg)}
+.dtba-frame.is-ccw img.dtba-main{transform:translate(-50%,-50%) rotate(-90deg)}
 .dtba-lbl{position:absolute;bottom:10px;inset-inline-start:10px;line-height:1.4}
 .dtba-cap{display:block}
 .dtba-card.is-lb{cursor:zoom-in}
@@ -59,7 +61,7 @@ function dt_register_widget_assets() {
 .dtlb-x{top:-56px;inset-inline-start:0}
 .dtlb-prev,.dtlb-next{top:50%;transform:translateY(-50%)}
 .dtlb-prev{inset-inline-start:-60px}.dtlb-next{inset-inline-end:-60px}
-@media (max-width:880px){.dtlb{padding:12px}.dtlb-box{padding:10px 10px 6px;gap:6px;width:100%}.dtlb-pair{flex-direction:column;gap:6px}.dtlb-fig img,.dtlb-fig canvas{max-height:calc((100vh - 130px)/2);max-height:calc((100svh - 130px)/2)}.dtlb-cap{min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 52px;font-size:15px}.dtlb .dtlb-x,.dtlb .dtlb-x:focus{top:18px;inset-inline-end:18px;z-index:2;background:rgba(46,42,36,.55);width:36px;height:36px}.dtlb .dtlb-prev,.dtlb .dtlb-next,.dtlb .dtlb-prev:focus,.dtlb .dtlb-next:focus{top:auto;bottom:6px;transform:none;color:#2E2A24;border-color:rgba(46,42,36,.35);background:transparent}.dtlb .dtlb-prev{inset-inline-start:10px}.dtlb .dtlb-next{inset-inline-end:10px}}
+@media (max-width:880px){.dtlb{padding:12px}.dtlb-box{padding:10px 10px 6px;gap:6px;width:100%}.dtlb-pair{flex-direction:column;gap:6px}.dtlb-fig img,.dtlb-fig canvas{max-height:calc((100vh - 130px)/2);max-height:calc((100svh - 130px)/2)}.dtlb-cap{min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 52px;font-size:15px}.dtlb .dtlb-x,.dtlb .dtlb-x:focus{top:18px;left:18px;right:auto;z-index:2;background:rgba(46,42,36,.55);width:36px;height:36px}.dtlb .dtlb-prev,.dtlb .dtlb-next,.dtlb .dtlb-prev:focus,.dtlb .dtlb-next:focus{top:auto;bottom:6px;transform:none;color:#2E2A24;border-color:rgba(46,42,36,.35);background:transparent}.dtlb .dtlb-prev{inset-inline-start:10px}.dtlb .dtlb-next{inset-inline-end:10px}}
 /* טאבים של טיפולים */
 .dtt-tabs{display:flex;flex-wrap:wrap}
 .dtt-tab{background:none;border:0;border-bottom:1px solid transparent;padding:0;cursor:pointer;font:inherit;color:inherit;border-radius:0;-webkit-tap-highlight-color:transparent}
@@ -107,7 +109,7 @@ CSS);
   });
   /* לפני ואחרי: תמונה שצולמה לרוחב מסתובבת לאורך */
   function rot(img){
-    var f=img.closest('.dtba-frame[data-rot="auto"]'); if(!f) return;
+    var f=img.closest('.dtba-frame[data-rot="auto"]'); if(!f||!img.classList.contains('dtba-main')) return;
     var go=function(){ if(img.naturalWidth>img.naturalHeight) f.classList.add('is-cw'); };
     if(img.complete&&img.naturalWidth) go(); else img.addEventListener('load',go,{once:true});
   }
