@@ -214,7 +214,13 @@ CSS);
     var t=hashTarget(a.hash); if(!t) return;
     var oc=a.closest('.e-off-canvas');
     e.preventDefault(); history.replaceState(null,'',a.hash);
-    if(oc){ var x=oc.querySelector('a[href*="off_canvas"][href*="close"]'); if(x) x.click(); setTimeout(function(){ jump(t,true); },420); }
+    if(oc){
+      var x=oc.querySelector('a[href*="off_canvas"][href*="close"]'); if(x) x.click();
+      /* התפריט נועל את הגלילה בזמן שהוא פתוח — מחכים שהנעילה תשתחרר ואז גוללים */
+      var tries=0, go=function(){ var lock=[document.documentElement,document.body].some(function(el){ return getComputedStyle(el).overflow==='hidden'||getComputedStyle(el).overflowY==='hidden'; });
+        if(lock&&tries++<40){ setTimeout(go,50); return; } jump(t,true); };
+      setTimeout(go,200);
+    }
     else jump(t,true);
   },true);
   /* סינון קטגוריות: מסתיר/מציג פריטים ברשת לפי המחלקה product_cat-<slug> */
