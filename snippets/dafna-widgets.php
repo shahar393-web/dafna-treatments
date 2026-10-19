@@ -80,6 +80,8 @@ function dts_register_widget_assets() {
 .dfm.is-fade{-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
 .dfm-track{display:flex;width:max-content;direction:ltr;animation:dfm-run var(--dfm-dur,40s) linear infinite}
 .dfm[data-dir="right"] .dfm-track{animation-direction:reverse}
+/* הפס עומד עד שהסקריפט מדד כמה לזוז — אחרת הוא מתחיל בערך זמני וקופץ כשהמדידה מגיעה */
+.dfm:not(.is-on) .dfm-track{animation-play-state:paused}
 @media (hover:hover){.dfm.is-pause:hover .dfm-track{animation-play-state:paused}}
 .dfm-set{display:flex;align-items:center;gap:var(--dfm-gap,32px);padding-inline-end:var(--dfm-gap,32px)}
 .dfm-set>*{direction:rtl;flex:0 0 auto}
@@ -251,7 +253,9 @@ CSS);
     var w=sets[0].getBoundingClientRect().width; if(!w) return;
     var need=Math.ceil(m.getBoundingClientRect().width/w)+1;
     for(var i=sets.length;i<need;i++){ var c=sets[sets.length-1].cloneNode(true); c.setAttribute('aria-hidden','true'); c.querySelectorAll('a').forEach(function(a){a.tabIndex=-1;}); tr.appendChild(c); }
-    m.style.setProperty('--dfm-to',(-w)+'px');
+    var to=(-Math.round(w*100)/100)+'px';
+    if(m.style.getPropertyValue('--dfm-to')!==to) m.style.setProperty('--dfm-to',to);   // רק אם השתנה — שינוי באמצע תנועה גורם לקפיצה
+    if(!m.classList.contains('is-on')) requestAnimationFrame(function(){ m.classList.add('is-on'); });
   }
   /* קישור לעוגן מעמוד אחר (למשל קטגוריה בחנות מהתפריט): אחרי שהעמוד נטען במלואו גוללים שוב לעוגן, כי התוכן שמעליו גדל בזמן הטעינה */
   /* מעבר לעוגן (למשל קטגוריה בחנות מהתפריט): קפיצה מיידית, ואז "הצמדה" קצרה — בזמן שתמונות נטענות התוכן שמעל גדל ודוחף את העוגן.
@@ -316,7 +320,7 @@ CSS);
     grid.querySelectorAll('.e-loop-item').forEach(function(it){ var ok=!cat||it.classList.contains('product_cat-'+cat)||(tid&&it.classList.contains('product_cat-'+tid)); it.style.display=ok?'':'none'; });
   });
   function fillAll(){ document.querySelectorAll('.dfm').forEach(fill); }
-  window.addEventListener('load',fillAll); window.addEventListener('resize',fillAll);
+  window.addEventListener('load',function(){ fillAll(); setTimeout(function(){ document.querySelectorAll('.dfm:not(.is-on)').forEach(function(m){ m.classList.add('is-on'); }); },1500); }); window.addEventListener('resize',fillAll);
   if(document.readyState!=='loading') fillAll(); else document.addEventListener('DOMContentLoaded',fillAll);
   /* בעורך של אלמנטור הווידג'ט נטען מחדש בכל שינוי — מאתחלים שוב */
   if(window.jQuery) jQuery(window).on('elementor/frontend/init',function(){
