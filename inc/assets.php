@@ -209,6 +209,8 @@ CSS);
   /* קישור לעוגן באותו עמוד מתוך תפריט המובייל: סוגרים את התפריט ואז גוללים בעדינות (אחרת העמוד נתקע מאחורי התפריט) */
   document.addEventListener('click',function(e){
     var a=e.target.closest&&e.target.closest('a[href*="#"]'); if(!a||a.pathname!==location.pathname||a.hash.length<2) return;
+    /* חץ פתיחה, או פריט בתפריט המובייל שיש תחתיו רשימה — רק פותחים את הרשימה, לא מנווטים */
+    if(e.target.closest('.sub-arrow')||(a.classList.contains('has-submenu')&&a.closest('.e-off-canvas, .elementor-nav-menu--dropdown'))) return;
     var t=hashTarget(a.hash); if(!t) return;
     var oc=a.closest('.e-off-canvas');
     e.preventDefault(); history.replaceState(null,'',a.hash);
