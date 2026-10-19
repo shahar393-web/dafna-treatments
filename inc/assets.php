@@ -81,6 +81,11 @@ function dt_register_widget_assets() {
 .dtk-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none;transition:transform .6s ease}
 .dtk.is-zoom .dtk-card:hover .dtk-img img{transform:scale(1.04)}
 .dtk-panel{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px}
+/* סינון קטגוריות (חנות) */
+.dtf{display:flex;flex-wrap:wrap;justify-content:center;gap:28px}
+.dtf-b{background:none!important;border:0;border-bottom:1px solid transparent;border-radius:0;padding:0 0 8px;cursor:pointer;font:inherit;color:#6E675D;white-space:nowrap;transition:color .25s,border-color .25s}
+.dtf-b:focus{outline:none}.dtf-b:focus-visible{outline:1px solid currentColor;outline-offset:4px}
+@media (max-width:767px){.dtf-scroll-yes .dtf{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;scrollbar-width:none;padding-bottom:2px}.dtf-scroll-yes .dtf::-webkit-scrollbar{display:none}}
 /* זכוכית מאירה: כתמי אור מאחור, כרטיס שקוף-למחצה עם טשטוש, ופס אור שעובר מדי פעם */
 .dtk-glass-yes .dtk{position:relative;isolation:isolate}
 .dtk-glass-yes .dtk::before{content:"";position:absolute;inset:-12% -6%;z-index:-1;pointer-events:none;filter:blur(36px);
@@ -186,6 +191,16 @@ CSS);
     for(var i=sets.length;i<need;i++){ var c=sets[sets.length-1].cloneNode(true); c.setAttribute('aria-hidden','true'); c.querySelectorAll('a').forEach(function(a){a.tabIndex=-1;}); tr.appendChild(c); }
     m.style.setProperty('--dfm-to',(-w)+'px');
   }
+  /* סינון קטגוריות: מסתיר/מציג פריטים ברשת לפי המחלקה product_cat-<slug> */
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('.dtf-b'); if(!b) return;
+    var bar=b.closest('.dtf'), id=bar.getAttribute('data-target'), w=bar.closest('.elementor-widget');
+    var grid=id?document.querySelector('.elementor-element-'+id):(w&&w.parentElement.querySelector('.elementor-widget-loop-grid'));
+    if(!grid) return;
+    bar.querySelectorAll('.dtf-b').forEach(function(x){var on=x===b;x.classList.toggle('is-on',on);x.setAttribute('aria-pressed',on?'true':'false');});
+    var cat=b.getAttribute('data-cat');
+    grid.querySelectorAll('.e-loop-item').forEach(function(it){ it.style.display=(!cat||it.classList.contains('product_cat-'+cat))?'':'none'; });
+  });
   function fillAll(){ document.querySelectorAll('.dfm').forEach(fill); }
   window.addEventListener('load',fillAll); window.addEventListener('resize',fillAll);
   if(document.readyState!=='loading') fillAll(); else document.addEventListener('DOMContentLoaded',fillAll);

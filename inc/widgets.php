@@ -551,6 +551,48 @@ class DT_Treatment_Cards_Widget extends DT_W_Base {
     }
 }
 
+/* ═══════════════════════════ 8 · סינון קטגוריות של מותג (חנות) ═══════════════════════════
+   כפתור לכל תת-קטגוריה של המותג שנבחר; לחיצה מסננת את רשת המוצרים (Loop Grid) במקום, בלי טעינה. */
+class DT_Cat_Filter_Widget extends DT_W_Base {
+    public function get_name()  { return 'dt_cat_filter'; }
+    public function get_title() { return 'Dafna · סינון קטגוריות'; }
+    public function get_icon()  { return 'eicon-filter'; }
+
+    protected function register_controls() {
+        $terms = get_terms(['taxonomy' => 'product_cat', 'parent' => 0, 'hide_empty' => false]);
+        $opts = [];
+        if (!is_wp_error($terms)) foreach ($terms as $t) $opts[$t->term_id] = $t->name;
+        $this->start_controls_section('c', ['label' => 'סינון']);
+        $this->add_control('parent', ['label' => 'המותג (הקטגוריה הראשית)', 'type' => CM::SELECT, 'options' => $opts, 'default' => (string) array_key_first($opts)]);
+        $this->add_control('target', ['label' => 'מזהה רשת המוצרים', 'type' => CM::TEXT, 'description' => 'ה-ID של רשת המוצרים. ריק = הרשת שבאותו קונטיינר.']);
+        $this->add_control('all', ['label' => 'כפתור "הכל"', 'type' => CM::TEXT, 'default' => 'הכל']);
+        $this->add_control('empty', ['label' => 'להציג קטגוריות ריקות', 'type' => CM::SWITCHER, 'default' => '']);
+        $this->add_responsive_control('align', ['label' => 'יישור', 'type' => CM::CHOOSE, 'default' => 'center',
+            'options' => ['flex-start' => ['title' => 'התחלה', 'icon' => 'eicon-h-align-right'], 'center' => ['title' => 'מרכז', 'icon' => 'eicon-h-align-center'], 'flex-end' => ['title' => 'סוף', 'icon' => 'eicon-h-align-left']],
+            'selectors' => ['{{WRAPPER}} .dtf' => 'justify-content:{{VALUE}}']]);
+        $this->add_control('scroll', ['label' => 'בטלפון: שורה אחת עם גלילה הצידה', 'type' => CM::SWITCHER, 'default' => 'yes', 'prefix_class' => 'dtf-scroll-']);
+        $this->end_controls_section();
+
+        $this->start_controls_section('s', ['label' => 'עיצוב', 'tab' => CM::TAB_STYLE]);
+        $this->add_group_control(GT::get_type(), ['name' => 't', 'selector' => '{{WRAPPER}} .dtf-b']);
+        $this->add_responsive_control('gap', ['label' => 'רווח בין כפתורים', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 28], 'selectors' => ['{{WRAPPER}} .dtf' => 'gap:{{SIZE}}{{UNIT}}']]);
+        $this->add_control('c', ['label' => 'צבע', 'type' => CM::COLOR, 'default' => '#6E675D', 'selectors' => ['{{WRAPPER}} .dtf-b' => 'color:{{VALUE}}']]);
+        $this->add_control('ca', ['label' => 'צבע פעיל / מעבר עכבר', 'type' => CM::COLOR, 'default' => '#2E2A24', 'selectors' => ['{{WRAPPER}} .dtf-b:hover,{{WRAPPER}} .dtf-b.is-on' => 'color:{{VALUE}}', '{{WRAPPER}} .dtf-b.is-on' => 'border-bottom-color:{{VALUE}}']]);
+        $this->add_control('pb', ['label' => 'רווח לקו התחתון', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 8], 'selectors' => ['{{WRAPPER}} .dtf-b' => 'padding-bottom:{{SIZE}}{{UNIT}}']]);
+        $this->end_controls_section();
+    }
+
+    protected function render() {
+        $s = $this->get_settings_for_display();
+        $kids = get_terms(['taxonomy' => 'product_cat', 'parent' => (int) ($s['parent'] ?? 0), 'hide_empty' => ($s['empty'] ?? '') !== 'yes', 'orderby' => 'name']);
+        if (is_wp_error($kids) || !$kids) return;
+        echo '<div class="dtf" role="toolbar" data-target="' . esc_attr($s['target'] ?? '') . '">';
+        echo '<button type="button" class="dtf-b is-on" data-cat="" aria-pressed="true">' . esc_html(($s['all'] ?? '') ?: 'הכל') . '</button>';
+        foreach ($kids as $k) echo '<button type="button" class="dtf-b" data-cat="' . esc_attr($k->slug) . '" aria-pressed="false">' . esc_html($k->name) . '</button>';
+        echo '</div>';
+    }
+}
+
 function dt_register_home_widgets($wm) {
-    foreach (['DT_Treatment_Tabs_Widget', 'DT_Before_After_Widget', 'DT_Brands_Widget', 'DT_Certs_Widget', 'DT_Reviews_Widget', 'DT_Faq_Widget', 'DT_Treatment_Cards_Widget'] as $c) $wm->register(new $c());
+    foreach (['DT_Treatment_Tabs_Widget', 'DT_Before_After_Widget', 'DT_Brands_Widget', 'DT_Certs_Widget', 'DT_Reviews_Widget', 'DT_Faq_Widget', 'DT_Treatment_Cards_Widget', 'DT_Cat_Filter_Widget'] as $c) $wm->register(new $c());
 }

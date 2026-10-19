@@ -97,6 +97,11 @@ function dts_register_widget_assets() {
 .dtk-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none;transition:transform .6s ease}
 .dtk.is-zoom .dtk-card:hover .dtk-img img{transform:scale(1.04)}
 .dtk-panel{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px}
+/* סינון קטגוריות (חנות) */
+.dtf{display:flex;flex-wrap:wrap;justify-content:center;gap:28px}
+.dtf-b{background:none!important;border:0;border-bottom:1px solid transparent;border-radius:0;padding:0 0 8px;cursor:pointer;font:inherit;color:#6E675D;white-space:nowrap;transition:color .25s,border-color .25s}
+.dtf-b:focus{outline:none}.dtf-b:focus-visible{outline:1px solid currentColor;outline-offset:4px}
+@media (max-width:767px){.dtf-scroll-yes .dtf{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;scrollbar-width:none;padding-bottom:2px}.dtf-scroll-yes .dtf::-webkit-scrollbar{display:none}}
 /* זכוכית מאירה: כתמי אור מאחור, כרטיס שקוף-למחצה עם טשטוש, ופס אור שעובר מדי פעם */
 .dtk-glass-yes .dtk{position:relative;isolation:isolate}
 .dtk-glass-yes .dtk::before{content:"";position:absolute;inset:-12% -6%;z-index:-1;pointer-events:none;filter:blur(36px);
@@ -202,6 +207,16 @@ CSS);
     for(var i=sets.length;i<need;i++){ var c=sets[sets.length-1].cloneNode(true); c.setAttribute('aria-hidden','true'); c.querySelectorAll('a').forEach(function(a){a.tabIndex=-1;}); tr.appendChild(c); }
     m.style.setProperty('--dfm-to',(-w)+'px');
   }
+  /* סינון קטגוריות: מסתיר/מציג פריטים ברשת לפי המחלקה product_cat-<slug> */
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('.dtf-b'); if(!b) return;
+    var bar=b.closest('.dtf'), id=bar.getAttribute('data-target'), w=bar.closest('.elementor-widget');
+    var grid=id?document.querySelector('.elementor-element-'+id):(w&&w.parentElement.querySelector('.elementor-widget-loop-grid'));
+    if(!grid) return;
+    bar.querySelectorAll('.dtf-b').forEach(function(x){var on=x===b;x.classList.toggle('is-on',on);x.setAttribute('aria-pressed',on?'true':'false');});
+    var cat=b.getAttribute('data-cat');
+    grid.querySelectorAll('.e-loop-item').forEach(function(it){ it.style.display=(!cat||it.classList.contains('product_cat-'+cat))?'':'none'; });
+  });
   function fillAll(){ document.querySelectorAll('.dfm').forEach(fill); }
   window.addEventListener('load',fillAll); window.addEventListener('resize',fillAll);
   if(document.readyState!=='loading') fillAll(); else document.addEventListener('DOMContentLoaded',fillAll);
@@ -764,8 +779,50 @@ class DTS_Treatment_Cards_Widget extends DTS_W_Base {
     }
 }
 
+/* ═══════════════════════════ 8 · סינון קטגוריות של מותג (חנות) ═══════════════════════════
+   כפתור לכל תת-קטגוריה של המותג שנבחר; לחיצה מסננת את רשת המוצרים (Loop Grid) במקום, בלי טעינה. */
+class DTS_Cat_Filter_Widget extends DTS_W_Base {
+    public function get_name()  { return 'dt_cat_filter'; }
+    public function get_title() { return 'Dafna · סינון קטגוריות'; }
+    public function get_icon()  { return 'eicon-filter'; }
+
+    protected function register_controls() {
+        $terms = get_terms(['taxonomy' => 'product_cat', 'parent' => 0, 'hide_empty' => false]);
+        $opts = [];
+        if (!is_wp_error($terms)) foreach ($terms as $t) $opts[$t->term_id] = $t->name;
+        $this->start_controls_section('c', ['label' => 'סינון']);
+        $this->add_control('parent', ['label' => 'המותג (הקטגוריה הראשית)', 'type' => CM::SELECT, 'options' => $opts, 'default' => (string) array_key_first($opts)]);
+        $this->add_control('target', ['label' => 'מזהה רשת המוצרים', 'type' => CM::TEXT, 'description' => 'ה-ID של רשת המוצרים. ריק = הרשת שבאותו קונטיינר.']);
+        $this->add_control('all', ['label' => 'כפתור "הכל"', 'type' => CM::TEXT, 'default' => 'הכל']);
+        $this->add_control('empty', ['label' => 'להציג קטגוריות ריקות', 'type' => CM::SWITCHER, 'default' => '']);
+        $this->add_responsive_control('align', ['label' => 'יישור', 'type' => CM::CHOOSE, 'default' => 'center',
+            'options' => ['flex-start' => ['title' => 'התחלה', 'icon' => 'eicon-h-align-right'], 'center' => ['title' => 'מרכז', 'icon' => 'eicon-h-align-center'], 'flex-end' => ['title' => 'סוף', 'icon' => 'eicon-h-align-left']],
+            'selectors' => ['{{WRAPPER}} .dtf' => 'justify-content:{{VALUE}}']]);
+        $this->add_control('scroll', ['label' => 'בטלפון: שורה אחת עם גלילה הצידה', 'type' => CM::SWITCHER, 'default' => 'yes', 'prefix_class' => 'dtf-scroll-']);
+        $this->end_controls_section();
+
+        $this->start_controls_section('s', ['label' => 'עיצוב', 'tab' => CM::TAB_STYLE]);
+        $this->add_group_control(GT::get_type(), ['name' => 't', 'selector' => '{{WRAPPER}} .dtf-b']);
+        $this->add_responsive_control('gap', ['label' => 'רווח בין כפתורים', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 28], 'selectors' => ['{{WRAPPER}} .dtf' => 'gap:{{SIZE}}{{UNIT}}']]);
+        $this->add_control('c', ['label' => 'צבע', 'type' => CM::COLOR, 'default' => '#6E675D', 'selectors' => ['{{WRAPPER}} .dtf-b' => 'color:{{VALUE}}']]);
+        $this->add_control('ca', ['label' => 'צבע פעיל / מעבר עכבר', 'type' => CM::COLOR, 'default' => '#2E2A24', 'selectors' => ['{{WRAPPER}} .dtf-b:hover,{{WRAPPER}} .dtf-b.is-on' => 'color:{{VALUE}}', '{{WRAPPER}} .dtf-b.is-on' => 'border-bottom-color:{{VALUE}}']]);
+        $this->add_control('pb', ['label' => 'רווח לקו התחתון', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 8], 'selectors' => ['{{WRAPPER}} .dtf-b' => 'padding-bottom:{{SIZE}}{{UNIT}}']]);
+        $this->end_controls_section();
+    }
+
+    protected function render() {
+        $s = $this->get_settings_for_display();
+        $kids = get_terms(['taxonomy' => 'product_cat', 'parent' => (int) ($s['parent'] ?? 0), 'hide_empty' => ($s['empty'] ?? '') !== 'yes', 'orderby' => 'name']);
+        if (is_wp_error($kids) || !$kids) return;
+        echo '<div class="dtf" role="toolbar" data-target="' . esc_attr($s['target'] ?? '') . '">';
+        echo '<button type="button" class="dtf-b is-on" data-cat="" aria-pressed="true">' . esc_html(($s['all'] ?? '') ?: 'הכל') . '</button>';
+        foreach ($kids as $k) echo '<button type="button" class="dtf-b" data-cat="' . esc_attr($k->slug) . '" aria-pressed="false">' . esc_html($k->name) . '</button>';
+        echo '</div>';
+    }
+}
+
 function dts_register_home_widgets($wm) {
-    foreach (['DTS_Treatment_Tabs_Widget', 'DTS_Before_After_Widget', 'DTS_Brands_Widget', 'DTS_Certs_Widget', 'DTS_Reviews_Widget', 'DTS_Faq_Widget', 'DTS_Treatment_Cards_Widget'] as $c) $wm->register(new $c());
+    foreach (['DTS_Treatment_Tabs_Widget', 'DTS_Before_After_Widget', 'DTS_Brands_Widget', 'DTS_Certs_Widget', 'DTS_Reviews_Widget', 'DTS_Faq_Widget', 'DTS_Treatment_Cards_Widget', 'DTS_Cat_Filter_Widget'] as $c) $wm->register(new $c());
 }
 
     }
