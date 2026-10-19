@@ -210,34 +210,31 @@ CSS);
     m.style.setProperty('--dfm-to',(-w)+'px');
   }
   /* קישור לעוגן מעמוד אחר (למשל קטגוריה בחנות מהתפריט): אחרי שהעמוד נטען במלואו גוללים שוב לעוגן, כי התוכן שמעליו גדל בזמן הטעינה */
+  /* מעבר לעוגן (למשל קטגוריה בחנות מהתפריט): קפיצה מיידית, ואז "הצמדה" קצרה — בזמן שתמונות נטענות התוכן שמעל גדל ודוחף את העוגן.
+     ההצמדה נעצרת ברגע שהגולשת גוללת בעצמה. 90 = גובה ההדר הקבוע + מרווח */
   function hashTarget(h){ if(!h||h.length<2) return null; try{ return document.getElementById(decodeURIComponent(h.slice(1))); }catch(e){ return null; } }
-  function jump(t,smooth){ if(t) t.scrollIntoView({block:'start',behavior:smooth?'smooth':'auto'}); }
-  /* כניסה מעמוד אחר: קפיצה מיד כשהעמוד מוכן, ותיקון אחד אחרי שהכול נטען (אם התוכן שמעל זז) */
-  /* בזמן שהתמונות והרשתות נטענות התוכן שמעל גדל: מצמידים את העוגן לראש המסך עד 4 שניות, או עד שהגולשת גוללת בעצמה */
-  (function(){
-    var t=null, stop=false, until=0;
-    ['wheel','touchstart','keydown','mousedown'].forEach(function(ev){ window.addEventListener(ev,function(){ stop=true; },{passive:true,once:true}); });
-    function pin(){ if(stop||!t||Date.now()>until) return; var d=t.getBoundingClientRect().top-90; if(Math.abs(d)>4) window.scrollBy(0,d); requestAnimationFrame(pin); }
-    function start(){ t=hashTarget(location.hash); if(!t) return; until=Date.now()+4000; jump(t,false); requestAnimationFrame(pin); }
-    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
-    window.addEventListener('load',function(){ if(t&&!stop){ until=Date.now()+1500; requestAnimationFrame(pin); } });
-  })();
-  /* קישור לעוגן באותו עמוד מתוך תפריט המובייל: סוגרים את התפריט ואז גוללים בעדינות (אחרת העמוד נתקע מאחורי התפריט) */
+  var pinT=null, pinUntil=0, pinStop=false;
+  ['wheel','touchmove','keydown'].forEach(function(ev){ window.addEventListener(ev,function(){ pinStop=true; },{passive:true}); });
+  function pin(){ if(pinStop||!pinT||Date.now()>pinUntil) return; var d=pinT.getBoundingClientRect().top-90; if(Math.abs(d)>3) window.scrollTo({top:window.scrollY+d,behavior:'instant'}); requestAnimationFrame(pin); }
+  function goTo(t,ms){ if(!t) return; pinT=t; pinStop=false; pinUntil=Date.now()+(ms||1500); window.scrollTo({top:window.scrollY+t.getBoundingClientRect().top-90,behavior:'instant'}); requestAnimationFrame(pin); }
+  /* כניסה מעמוד אחר עם עוגן בכתובת */
+  function onReady(){ goTo(hashTarget(location.hash),4000); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',onReady); else onReady();
+  window.addEventListener('load',function(){ if(pinT&&!pinStop){ pinUntil=Math.max(pinUntil,Date.now()+1200); requestAnimationFrame(pin); } });
+  /* עוגן באותו עמוד (מהתפריט במחשב או בטלפון) */
   document.addEventListener('click',function(e){
     var a=e.target.closest&&e.target.closest('a[href*="#"]'); if(!a||a.pathname!==location.pathname||a.hash.length<2) return;
     /* חץ פתיחה, או פריט בתפריט המובייל שיש תחתיו רשימה — רק פותחים את הרשימה, לא מנווטים */
     if(e.target.closest('.sub-arrow')||(a.classList.contains('has-submenu')&&a.closest('.e-off-canvas, .elementor-nav-menu--dropdown'))) return;
     var t=hashTarget(a.hash); if(!t) return;
-    var oc=a.closest('.e-off-canvas');
     e.preventDefault(); history.replaceState(null,'',a.hash);
-    if(oc){
-      var x=oc.querySelector('a[href*="off_canvas"][href*="close"]'); if(x) x.click();
-      /* התפריט נועל את הגלילה בזמן שהוא פתוח — מחכים שהנעילה תשתחרר ואז גוללים */
-      var tries=0, go=function(){ var lock=[document.documentElement,document.body].some(function(el){ return getComputedStyle(el).overflow==='hidden'||getComputedStyle(el).overflowY==='hidden'; });
-        if(lock&&tries++<40){ setTimeout(go,50); return; } jump(t,true); };
-      setTimeout(go,200);
-    }
-    else jump(t,true);
+    var oc=a.closest('.e-off-canvas');
+    if(!oc){ goTo(t); return; }
+    var x=oc.querySelector('a[href*="off_canvas"][href*="close"]'); if(x) x.click();
+    /* תפריט המובייל נועל את הגלילה בזמן שהוא פתוח — מחכים שהנעילה תשתחרר */
+    var tries=0, go=function(){ var lock=[document.documentElement,document.body].some(function(el){ var c=getComputedStyle(el); return c.overflow==='hidden'||c.overflowY==='hidden'; });
+      if(lock&&tries++<40){ setTimeout(go,40); return; } goTo(t); };
+    setTimeout(go,120);
   },true);
   /* סינון קטגוריות: מסתיר/מציג פריטים ברשת לפי המחלקה product_cat-<slug> */
   document.addEventListener('click',function(e){
