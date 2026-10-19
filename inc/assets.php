@@ -210,9 +210,12 @@ CSS);
     if(title&&title.scrollIntoView){ try{ title.scrollIntoView({block:'nearest',inline:'center'}); }catch(e){} }
     return {t:t,switched:sw};
   }
-  function goTo(t,ms){ if(!t) return; var o=openTab(t);
+  function goTo(t,ms){ if(!t) return; var o=openTab(t), tries=0;
     var run=function(){ pinT=o.t; pinStop=false; pinUntil=Date.now()+(ms||1500); window.scrollTo({top:window.scrollY+o.t.getBoundingClientRect().top-90,behavior:'instant'}); requestAnimationFrame(pin); };
-    if(o.switched) setTimeout(run,80); else run(); }
+    /* בכניסה לעמוד הטאבים של אלמנטור עוד לא מוכנים ללחיצה — מנסים שוב עד שהטאב באמת נפתח (עד 4 שניות) */
+    var check=function(){ var panel=t.closest('[role="tabpanel"]'), title=panel&&document.querySelector('.e-n-tab-title[aria-controls="'+panel.id+'"]');
+      if(!title||title.getAttribute('aria-selected')==='true'||tries++>40){ run(); return; } title.click(); setTimeout(check,100); };
+    if(o.switched) setTimeout(check,80); else run(); }
   /* כניסה מעמוד אחר עם עוגן בכתובת */
   function onReady(){ goTo(hashTarget(location.hash),4000); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',onReady); else onReady();
