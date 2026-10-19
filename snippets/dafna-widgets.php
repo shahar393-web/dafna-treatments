@@ -207,6 +207,12 @@ CSS);
     for(var i=sets.length;i<need;i++){ var c=sets[sets.length-1].cloneNode(true); c.setAttribute('aria-hidden','true'); c.querySelectorAll('a').forEach(function(a){a.tabIndex=-1;}); tr.appendChild(c); }
     m.style.setProperty('--dfm-to',(-w)+'px');
   }
+  /* קישור לעוגן מעמוד אחר (למשל קטגוריה בחנות מהתפריט): אחרי שהעמוד נטען במלואו גוללים שוב לעוגן, כי התוכן שמעליו גדל בזמן הטעינה */
+  window.addEventListener('load',function(){
+    if(!location.hash||location.hash.length<2) return;
+    var t=null; try{ t=document.getElementById(decodeURIComponent(location.hash.slice(1))); }catch(e){}
+    if(t) setTimeout(function(){ t.scrollIntoView({block:'start'}); },60);
+  });
   /* סינון קטגוריות: מסתיר/מציג פריטים ברשת לפי המחלקה product_cat-<slug> */
   document.addEventListener('click',function(e){
     var b=e.target.closest&&e.target.closest('.dtf-b'); if(!b) return;
