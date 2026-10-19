@@ -197,8 +197,15 @@ CSS);
   function hashTarget(h){ if(!h||h.length<2) return null; try{ return document.getElementById(decodeURIComponent(h.slice(1))); }catch(e){ return null; } }
   function jump(t,smooth){ if(t) t.scrollIntoView({block:'start',behavior:smooth?'smooth':'auto'}); }
   /* כניסה מעמוד אחר: קפיצה מיד כשהעמוד מוכן, ותיקון אחד אחרי שהכול נטען (אם התוכן שמעל זז) */
-  document.addEventListener('DOMContentLoaded',function(){ jump(hashTarget(location.hash),false); });
-  window.addEventListener('load',function(){ var t=hashTarget(location.hash); if(t&&Math.abs(t.getBoundingClientRect().top-90)>6) setTimeout(function(){ jump(t,false); },40); });
+  /* בזמן שהתמונות והרשתות נטענות התוכן שמעל גדל: מצמידים את העוגן לראש המסך עד 4 שניות, או עד שהגולשת גוללת בעצמה */
+  (function(){
+    var t=null, stop=false, until=0;
+    ['wheel','touchstart','keydown','mousedown'].forEach(function(ev){ window.addEventListener(ev,function(){ stop=true; },{passive:true,once:true}); });
+    function pin(){ if(stop||!t||Date.now()>until) return; var d=t.getBoundingClientRect().top-90; if(Math.abs(d)>4) window.scrollBy(0,d); requestAnimationFrame(pin); }
+    function start(){ t=hashTarget(location.hash); if(!t) return; until=Date.now()+4000; jump(t,false); requestAnimationFrame(pin); }
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+    window.addEventListener('load',function(){ if(t&&!stop){ until=Date.now()+1500; requestAnimationFrame(pin); } });
+  })();
   /* קישור לעוגן באותו עמוד מתוך תפריט המובייל: סוגרים את התפריט ואז גוללים בעדינות (אחרת העמוד נתקע מאחורי התפריט) */
   document.addEventListener('click',function(e){
     var a=e.target.closest&&e.target.closest('a[href*="#"]'); if(!a||a.pathname!==location.pathname||a.hash.length<2) return;
