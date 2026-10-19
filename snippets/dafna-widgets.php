@@ -156,10 +156,10 @@ function dts_register_widget_assets() {
   animation:dtk-float 16s ease-in-out infinite alternate}
 @keyframes dtk-float{to{transform:translate3d(3%,-4%,0) scale(1.06)}}
 .dtk-glass-yes .dtk-card{background-color:rgba(255,255,255,.42)!important;-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border:1px solid rgba(255,255,255,.75);box-shadow:0 24px 50px -28px rgba(46,42,36,.4),inset 0 1px 0 rgba(255,255,255,.95)}
-.dtk-glass-yes .dtk-card::after{content:"";position:absolute;top:-40%;bottom:-40%;left:-70%;width:45%;z-index:2;pointer-events:none;transform:skewX(-18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);animation:dtk-shine 7s ease-in-out infinite}
-.dtk-glass-yes .dtk-card:nth-child(2)::after{animation-delay:1.2s}.dtk-glass-yes .dtk-card:nth-child(3)::after{animation-delay:2.4s}.dtk-glass-yes .dtk-card:nth-child(4)::after{animation-delay:3.6s}
+.dtk-shine-yes .dtk-card::after{content:"";position:absolute;top:-40%;bottom:-40%;left:-70%;width:45%;z-index:2;pointer-events:none;transform:skewX(-18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);animation:dtk-shine 7s ease-in-out infinite}
+.dtk-shine-yes .dtk-card:nth-child(2)::after{animation-delay:1.2s}.dtk-shine-yes .dtk-card:nth-child(3)::after{animation-delay:2.4s}.dtk-shine-yes .dtk-card:nth-child(4)::after{animation-delay:3.6s}
 @keyframes dtk-shine{0%,72%{left:-70%}100%{left:135%}}
-@media (prefers-reduced-motion:reduce){.dtk-glass-yes .dtk::before,.dtk-glass-yes .dtk-card::after{animation:none}}
+@media (prefers-reduced-motion:reduce){.dtk-glass-yes .dtk::before,.dtk-shine-yes .dtk-card::after{animation:none}}
 .dtk-eb{letter-spacing:.1em;font-size:11px}
 .dtk-title{font-size:20px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .dtk-desc{font-size:14px;line-height:1.6;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
@@ -798,6 +798,7 @@ class DTS_Treatment_Cards_Widget extends DTS_W_Base {
         $this->add_control('cbg', ['label' => 'רקע הכרטיס', 'type' => CM::COLOR, 'default' => '#FFFFFF', 'selectors' => ['{{WRAPPER}} .dtk-card' => 'background-color:{{VALUE}}']]);
         $this->add_control('glass', ['label' => 'אפקט זכוכית מאירה', 'type' => CM::SWITCHER, 'default' => '', 'prefix_class' => 'dtk-glass-',
             'description' => 'כרטיס שקוף-למחצה עם טשטוש, כתמי אור רכים מאחור ופס אור שעובר על הכרטיס']);
+        $this->add_control('shine', ['label' => 'פס אור שעובר על הכרטיס', 'type' => CM::SWITCHER, 'default' => '', 'prefix_class' => 'dtk-shine-', 'condition' => ['glass' => 'yes']]);
         $this->add_control('glow', ['label' => 'צבע כתמי האור', 'type' => CM::COLOR, 'default' => 'rgba(184,169,146,0.55)', 'condition' => ['glass' => 'yes'],
             'selectors' => ['{{WRAPPER}}' => '--dtk-glow:{{VALUE}}']]);
         $this->add_responsive_control('r', ['label' => 'פינות', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 12], 'selectors' => ['{{WRAPPER}} .dtk-card' => 'border-radius:{{SIZE}}{{UNIT}}']]);

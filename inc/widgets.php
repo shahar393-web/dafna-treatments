@@ -478,6 +478,7 @@ class DT_Treatment_Cards_Widget extends DT_W_Base {
         $this->add_control('cbg', ['label' => 'רקע הכרטיס', 'type' => CM::COLOR, 'default' => '#FFFFFF', 'selectors' => ['{{WRAPPER}} .dtk-card' => 'background-color:{{VALUE}}']]);
         $this->add_control('glass', ['label' => 'אפקט זכוכית מאירה', 'type' => CM::SWITCHER, 'default' => '', 'prefix_class' => 'dtk-glass-',
             'description' => 'כרטיס שקוף-למחצה עם טשטוש, כתמי אור רכים מאחור ופס אור שעובר על הכרטיס']);
+        $this->add_control('shine', ['label' => 'פס אור שעובר על הכרטיס', 'type' => CM::SWITCHER, 'default' => '', 'prefix_class' => 'dtk-shine-', 'condition' => ['glass' => 'yes']]);
         $this->add_control('glow', ['label' => 'צבע כתמי האור', 'type' => CM::COLOR, 'default' => 'rgba(184,169,146,0.55)', 'condition' => ['glass' => 'yes'],
             'selectors' => ['{{WRAPPER}}' => '--dtk-glow:{{VALUE}}']]);
         $this->add_responsive_control('r', ['label' => 'פינות', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 12], 'selectors' => ['{{WRAPPER}} .dtk-card' => 'border-radius:{{SIZE}}{{UNIT}}']]);
