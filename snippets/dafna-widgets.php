@@ -24,6 +24,8 @@ if (!defined('DT_VER')) define('DT_VER', '2.6.0');
 
 add_action('wp_enqueue_scripts', 'dts_register_widget_assets', 5);
 add_action('elementor/frontend/after_register_scripts', 'dts_register_widget_assets');
+// נטען בכל עמוד (קטן): גם עמודים בלי ווידג'ט שלנו צריכים את הגלילה לעוגן אחרי טעינה (למשל החנות מהתפריט)
+add_action('wp_enqueue_scripts', function () { wp_enqueue_script('dt-widgets'); wp_enqueue_style('dt-widgets'); }, 20);
 function dts_register_widget_assets() {
     if (wp_style_is('dt-widgets', 'registered')) return;
     wp_register_style('dt-widgets', false, [], DT_VER);
