@@ -155,7 +155,6 @@ function dts_register_widget_assets() {
   background:radial-gradient(38% 52% at 18% 35%,var(--dtk-glow,rgba(184,169,146,.55)),transparent 70%),radial-gradient(34% 48% at 82% 65%,var(--dtk-glow,rgba(184,169,146,.55)),transparent 70%),radial-gradient(30% 42% at 52% 15%,rgba(255,255,255,.9),transparent 70%);
   animation:dtk-float 16s ease-in-out infinite alternate}
 @keyframes dtk-float{to{transform:translate3d(3%,-4%,0) scale(1.06)}}
-.dtk-glass-yes .dtk-card{-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3)}
 .dtk-shine-yes .dtk-card::after{content:"";position:absolute;top:-40%;bottom:-40%;left:-70%;width:45%;z-index:2;pointer-events:none;transform:skewX(-18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);animation:dtk-shine 7s ease-in-out infinite}
 .dtk-shine-yes .dtk-card:nth-child(2)::after{animation-delay:1.2s}.dtk-shine-yes .dtk-card:nth-child(3)::after{animation-delay:2.4s}.dtk-shine-yes .dtk-card:nth-child(4)::after{animation-delay:3.6s}
 @keyframes dtk-shine{0%,72%{left:-70%}100%{left:135%}}
