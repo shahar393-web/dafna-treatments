@@ -83,7 +83,7 @@ function dt_register_widget_assets() {
 .dtba-card{margin:0;display:flex;flex-direction:column;width:var(--dtba-w,560px)}
 .dtba-pair{display:flex;gap:var(--dtba-gap,8px)}
 .dtba-img{position:relative;flex:1 1 0;display:block;min-width:0}
-.dtba-frame{display:block;position:relative;aspect-ratio:var(--dtba-ratio,3/4);overflow:hidden;container-type:size}
+.dtba-frame{display:block;position:relative;aspect-ratio:var(--dtba-ratio,3/4);overflow:hidden;container-type:size;isolation:isolate;-webkit-mask-image:-webkit-radial-gradient(#fff,#000)}
 .dtba-frame{background:#2E2A24}
 .dtba-frame img.dtba-main{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;max-width:none;z-index:1}
 .dtba-bg{position:absolute;inset:-10%;width:120%;height:120%;max-width:none;object-fit:cover;filter:blur(18px);opacity:.9}
@@ -99,7 +99,7 @@ function dt_register_widget_assets() {
 .dtlb.is-on{opacity:1}
 .dtlb-box{position:relative;background:var(--dtba-lb-fr,rgba(51,46,38,.72));color:var(--dtba-lb-tx,#F2F1EC);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid rgba(242,241,236,.14);border-radius:var(--dtba-lb-r,18px);padding:16px 16px 14px;max-width:min(1100px,100%);max-height:100%;display:flex;flex-direction:column;gap:12px;box-shadow:0 30px 80px -20px rgba(0,0,0,.45)}
 .dtlb-pair{display:flex;gap:10px;min-height:0}
-.dtlb-fig{position:relative;flex:1 1 0;margin:0;min-width:0;display:flex;overflow:hidden;border-radius:calc(var(--dtba-lb-r,18px) - 6px)}
+.dtlb-fig{position:relative;flex:1 1 0;margin:0;min-width:0;display:flex;overflow:hidden;border-radius:calc(var(--dtba-lb-r,18px) - 6px);clip-path:inset(0 round calc(var(--dtba-lb-r,18px) - 6px));isolation:isolate}
 /* איפה שהתמונה לא ממלאת את המסגרת — אותה תמונה מטושטשת מאחור, כמו בפס עצמו */
 .dtlb-fig img.dtlb-bg{position:absolute;inset:-10%;width:120%;height:120%;max-width:none;max-height:none;object-fit:cover;filter:blur(18px);opacity:.9;border-radius:0;background:none}
 .dtlb-fig img,.dtlb-fig canvas{display:block;width:100%;height:auto;max-height:calc(100vh - 180px);object-fit:contain;border-radius:calc(var(--dtba-lb-r,18px) - 6px);background:transparent;position:relative;z-index:1}
