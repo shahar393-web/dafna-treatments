@@ -200,7 +200,7 @@ CSS);
   var pinT=null, pinUntil=0, pinStop=false;
   ['wheel','touchmove','keydown'].forEach(function(ev){ window.addEventListener(ev,function(){ pinStop=true; },{passive:true}); });
   /* כמה מקום תופס ההדר הקבוע בפועל (כולל סרגל הניהול של וורדפרס כשמחוברים) + 28 מרווח */
-  function offTop(){ var m=0; document.querySelectorAll('[data-elementor-type="header"] .e-con, #wpadminbar').forEach(function(el){ if(el.closest('.elementor-sticky__spacer')) return; var c=getComputedStyle(el), r=el.getBoundingClientRect(); if((c.position==='fixed'||c.position==='sticky'||el.id==='wpadminbar')&&r.top<=1&&r.bottom>m&&r.bottom<300) m=r.bottom; }); return (m||64)+28; }
+  function offTop(){ var m=0; document.querySelectorAll('[data-elementor-type="header"] .e-con, #wpadminbar').forEach(function(el){ if(el.closest('.elementor-sticky__spacer')) return; var c=getComputedStyle(el), r=el.getBoundingClientRect(); if((c.position==='fixed'||c.position==='sticky'||el.id==='wpadminbar')&&r.top<120&&r.height>0&&r.bottom>m&&r.bottom<300) m=r.bottom; }); return (m||64)+28; }
   function pin(){ if(pinStop||!pinT||Date.now()>pinUntil) return; var d=pinT.getBoundingClientRect().top-offTop(); if(Math.abs(d)>3) window.scrollTo({top:window.scrollY+d,behavior:'instant'}); setTimeout(pin,30); }
   /* עוגן שנמצא בתוך טאב סגור (למשל קטגוריה של Noon בחנות): פותחים קודם את הטאב שלו.
      עוגן של מותג שלם (הדבר הראשון בטאב) — גוללים לשורת הטאבים עצמה, כדי שרואים איזה מותג פתוח */
