@@ -3,8 +3,8 @@
  * טאבים של טיפולים · לפני ואחרי · מותגים · פס תעודות · המלצות · שאלות ותשובות · כרטיסי טיפולים
  *
  * עורכים כאן ושומרים — אין צורך להעלות תוסף. הנתונים (טיפולים, פרטי העסק, שאלות) נשארים בתוסף Dafna Treatments.
- * כשהסניפט פעיל התוסף לא טוען את העותק הישן שלו. כיבוי הסניפט = התוסף חוזר לעותק שלו.
- * החלק הראשון: CSS ו-JS. החלק השני: הווידג'טים עצמם.
+ * כשהסניפט פעיל התוסף לא טוען את העותק שלו. כיבוי הסניפט = התוסף חוזר לעותק שלו.
+ * חלק 1: CSS ו-JS. חלק 2: הווידג'טים.
  */
 use Elementor\Controls_Manager as CM;
 use Elementor\Group_Control_Typography as GT;
@@ -22,9 +22,9 @@ if (!defined('DT_VER')) define('DT_VER', '2.6.0');
  * כל הצבעים, הגדלים והמרווחים מגיעים מהקונטרולים של הווידג'ט — כאן רק המבנה.
  */
 
-add_action('wp_enqueue_scripts', 'dt_register_widget_assets', 5);
-add_action('elementor/frontend/after_register_scripts', 'dt_register_widget_assets');
-function dt_register_widget_assets() {
+add_action('wp_enqueue_scripts', 'dts_register_widget_assets', 5);
+add_action('elementor/frontend/after_register_scripts', 'dts_register_widget_assets');
+function dts_register_widget_assets() {
     if (wp_style_is('dt-widgets', 'registered')) return;
     wp_register_style('dt-widgets', false, [], DT_VER);
     wp_add_inline_style('dt-widgets', <<<CSS
@@ -205,7 +205,7 @@ JS);
 /* ═════ חלק 2 · הווידג'טים ═════ */
 add_action('elementor/widgets/register', function ($wm) {
     if (!class_exists('\Elementor\Widget_Base')) return;
-    if (!class_exists('DT_W_Base')) {
+    if (!class_exists('DTS_W_Base')) {
 /**
  * הווידג'טים של 2.4.0 — כולם בקטגוריה "Dafna" בעורך.
  *
@@ -218,7 +218,7 @@ add_action('elementor/widgets/register', function ($wm) {
  */
 
 
-abstract class DT_W_Base extends \Elementor\Widget_Base {
+abstract class DTS_W_Base extends \Elementor\Widget_Base {
     public function get_categories()   { return ['dafna']; }
     public function get_style_depends(): array  { return ['dt-widgets']; }
     public function get_script_depends(): array { return ['dt-widgets']; }
@@ -247,7 +247,7 @@ abstract class DT_W_Base extends \Elementor\Widget_Base {
 }
 
 /* ═══════════════════════════ 1 · טאבים של טיפולים ═══════════════════════════ */
-class DT_Treatment_Tabs_Widget extends DT_W_Base {
+class DTS_Treatment_Tabs_Widget extends DTS_W_Base {
     public function get_name()  { return 'dt_treatment_tabs'; }
     public function get_title() { return 'Dafna · טאבים של טיפולים'; }
     public function get_icon()  { return 'eicon-tabs'; }
@@ -331,7 +331,7 @@ class DT_Treatment_Tabs_Widget extends DT_W_Base {
 }
 
 /* ═══════════════════════════ 2 · לפני ואחרי ═══════════════════════════ */
-class DT_Before_After_Widget extends DT_W_Base {
+class DTS_Before_After_Widget extends DTS_W_Base {
     public function get_name()  { return 'dt_before_after'; }
     public function get_title() { return 'Dafna · לפני ואחרי'; }
     public function get_icon()  { return 'eicon-image-before-after'; }
@@ -434,7 +434,7 @@ class DT_Before_After_Widget extends DT_W_Base {
 }
 
 /* ═══════════════════════════ 3 · מותגים ═══════════════════════════ */
-class DT_Brands_Widget extends DT_W_Base {
+class DTS_Brands_Widget extends DTS_W_Base {
     public function get_name()  { return 'dt_brands'; }
     public function get_title() { return 'Dafna · מותגים'; }
     public function get_icon()  { return 'eicon-logo'; }
@@ -477,7 +477,7 @@ class DT_Brands_Widget extends DT_W_Base {
 }
 
 /* ═══════════════════════════ 4 · פס תעודות ═══════════════════════════ */
-class DT_Certs_Widget extends DT_W_Base {
+class DTS_Certs_Widget extends DTS_W_Base {
     public function get_name()  { return 'dt_certs'; }
     public function get_title() { return 'Dafna · פס תעודות'; }
     public function get_icon()  { return 'eicon-check-circle-o'; }
@@ -512,7 +512,7 @@ class DT_Certs_Widget extends DT_W_Base {
 }
 
 /* ═══════════════════════════ 5 · המלצות (גוגל / ידני) ═══════════════════════════ */
-function dt_google_reviews() {
+function dts_google_reviews() {
     $key = dt_biz('google_key'); $place = dt_biz('google_place');
     if (!$key || !$place) return [];
     $tk = 'dt_reviews_' . md5($place);
@@ -533,7 +533,7 @@ function dt_google_reviews() {
     return $out;
 }
 
-class DT_Reviews_Widget extends DT_W_Base {
+class DTS_Reviews_Widget extends DTS_W_Base {
     public function get_name()  { return 'dt_reviews'; }
     public function get_title() { return 'Dafna · המלצות'; }
     public function get_icon()  { return 'eicon-testimonial'; }
@@ -578,7 +578,7 @@ class DT_Reviews_Widget extends DT_W_Base {
         $s = $this->get_settings_for_display();
         $items = [];
         if (($s['src'] ?? 'google') === 'google') {
-            foreach (dt_google_reviews() as $r) if ($r['stars'] >= (int) ($s['min_stars'] ?: 4)) $items[] = $r;
+            foreach (dts_google_reviews() as $r) if ($r['stars'] >= (int) ($s['min_stars'] ?: 4)) $items[] = $r;
         }
         if (!$items) foreach ((array) ($s['items'] ?? []) as $r) $items[] = ['q' => $r['q'] ?? '', 'name' => $r['name'] ?? '', 'stars' => 5];
         $items = array_slice($items, 0, max(1, (int) $s['count']));
@@ -592,7 +592,7 @@ class DT_Reviews_Widget extends DT_W_Base {
 }
 
 /* ═══════════════════════════ 6 · שאלות ותשובות ═══════════════════════════ */
-class DT_Faq_Widget extends DT_W_Base {
+class DTS_Faq_Widget extends DTS_W_Base {
     public function get_name()  { return 'dt_faq_list'; }
     public function get_title() { return 'Dafna · שאלות ותשובות'; }
     public function get_icon()  { return 'eicon-accordion'; }
@@ -643,7 +643,7 @@ class DT_Faq_Widget extends DT_W_Base {
 }
 
 /* ═══════════════════════════ 7 · כרטיסי טיפולים (זכוכית) ═══════════════════════════ */
-class DT_Treatment_Cards_Widget extends DT_W_Base {
+class DTS_Treatment_Cards_Widget extends DTS_W_Base {
     public function get_name()  { return 'dt_treatment_cards'; }
     public function get_title() { return 'Dafna · כרטיסי טיפולים'; }
     public function get_icon()  { return 'eicon-posts-grid'; }
@@ -749,11 +749,11 @@ class DT_Treatment_Cards_Widget extends DT_W_Base {
     }
 }
 
-function dt_register_home_widgets($wm) {
-    foreach (['DT_Treatment_Tabs_Widget', 'DT_Before_After_Widget', 'DT_Brands_Widget', 'DT_Certs_Widget', 'DT_Reviews_Widget', 'DT_Faq_Widget', 'DT_Treatment_Cards_Widget'] as $c) $wm->register(new $c());
+function dts_register_home_widgets($wm) {
+    foreach (['DTS_Treatment_Tabs_Widget', 'DTS_Before_After_Widget', 'DTS_Brands_Widget', 'DTS_Certs_Widget', 'DTS_Reviews_Widget', 'DTS_Faq_Widget', 'DTS_Treatment_Cards_Widget'] as $c) $wm->register(new $c());
 }
 
     }
-    dt_register_home_widgets($wm);
+    dts_register_home_widgets($wm);
 }, 25);
 }
