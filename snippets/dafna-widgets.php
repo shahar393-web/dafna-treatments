@@ -216,7 +216,19 @@ CSS);
   var pinT=null, pinUntil=0, pinStop=false;
   ['wheel','touchmove','keydown'].forEach(function(ev){ window.addEventListener(ev,function(){ pinStop=true; },{passive:true}); });
   function pin(){ if(pinStop||!pinT||Date.now()>pinUntil) return; var d=pinT.getBoundingClientRect().top-90; if(Math.abs(d)>3) window.scrollTo({top:window.scrollY+d,behavior:'instant'}); requestAnimationFrame(pin); }
-  function goTo(t,ms){ if(!t) return; pinT=t; pinStop=false; pinUntil=Date.now()+(ms||1500); window.scrollTo({top:window.scrollY+t.getBoundingClientRect().top-90,behavior:'instant'}); requestAnimationFrame(pin); }
+  /* עוגן שנמצא בתוך טאב סגור (למשל קטגוריה של Noon בחנות): פותחים קודם את הטאב שלו.
+     עוגן של מותג שלם (הדבר הראשון בטאב) — גוללים לשורת הטאבים עצמה, כדי שרואים איזה מותג פתוח */
+  function openTab(t){
+    var panel=t.closest('[role="tabpanel"]'); if(!panel) return {t:t,switched:false};
+    var title=document.querySelector('.e-n-tab-title[aria-controls="'+panel.id+'"]'), sw=false;
+    if(title&&title.getAttribute('aria-selected')!=='true'){ title.click(); sw=true; }
+    if(t.parentElement===panel||t===panel.firstElementChild){ var w=panel.closest('.elementor-widget-n-tabs'); if(w) t=w; }
+    if(title&&title.scrollIntoView){ try{ title.scrollIntoView({block:'nearest',inline:'center'}); }catch(e){} }
+    return {t:t,switched:sw};
+  }
+  function goTo(t,ms){ if(!t) return; var o=openTab(t);
+    var run=function(){ pinT=o.t; pinStop=false; pinUntil=Date.now()+(ms||1500); window.scrollTo({top:window.scrollY+o.t.getBoundingClientRect().top-90,behavior:'instant'}); requestAnimationFrame(pin); };
+    if(o.switched) setTimeout(run,80); else run(); }
   /* כניסה מעמוד אחר עם עוגן בכתובת */
   function onReady(){ goTo(hashTarget(location.hash),4000); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',onReady); else onReady();
