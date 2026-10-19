@@ -215,7 +215,9 @@ CSS);
   function hashTarget(h){ if(!h||h.length<2) return null; try{ return document.getElementById(decodeURIComponent(h.slice(1))); }catch(e){ return null; } }
   var pinT=null, pinUntil=0, pinStop=false;
   ['wheel','touchmove','keydown'].forEach(function(ev){ window.addEventListener(ev,function(){ pinStop=true; },{passive:true}); });
-  function pin(){ if(pinStop||!pinT||Date.now()>pinUntil) return; var d=pinT.getBoundingClientRect().top-90; if(Math.abs(d)>3) window.scrollTo({top:window.scrollY+d,behavior:'instant'}); requestAnimationFrame(pin); }
+  /* כמה מקום תופס ההדר הקבוע בפועל (כולל סרגל הניהול של וורדפרס כשמחוברים) + 28 מרווח */
+  function offTop(){ var m=0; document.querySelectorAll('[data-elementor-type="header"] .e-con, #wpadminbar').forEach(function(el){ if(el.closest('.elementor-sticky__spacer')) return; var c=getComputedStyle(el), r=el.getBoundingClientRect(); if((c.position==='fixed'||c.position==='sticky'||el.id==='wpadminbar')&&r.top<=1&&r.bottom>m&&r.bottom<300) m=r.bottom; }); return (m||64)+28; }
+  function pin(){ if(pinStop||!pinT||Date.now()>pinUntil) return; var d=pinT.getBoundingClientRect().top-offTop(); if(Math.abs(d)>3) window.scrollTo({top:window.scrollY+d,behavior:'instant'}); requestAnimationFrame(pin); }
   /* עוגן שנמצא בתוך טאב סגור (למשל קטגוריה של Noon בחנות): פותחים קודם את הטאב שלו.
      עוגן של מותג שלם (הדבר הראשון בטאב) — גוללים לשורת הטאבים עצמה, כדי שרואים איזה מותג פתוח */
   function openTab(t){
@@ -227,7 +229,7 @@ CSS);
     return {t:t,switched:sw};
   }
   function goTo(t,ms){ if(!t) return; var o=openTab(t), tries=0;
-    var run=function(){ pinT=o.t; pinStop=false; pinUntil=Date.now()+(ms||1500); window.scrollTo({top:window.scrollY+o.t.getBoundingClientRect().top-90,behavior:'instant'}); requestAnimationFrame(pin); };
+    var run=function(){ pinT=o.t; pinStop=false; pinUntil=Date.now()+(ms||1500); window.scrollTo({top:window.scrollY+o.t.getBoundingClientRect().top-offTop(),behavior:'instant'}); requestAnimationFrame(pin); };
     /* בכניסה לעמוד הטאבים של אלמנטור עוד לא מוכנים ללחיצה — מנסים שוב עד שהטאב באמת נפתח (עד 4 שניות) */
     var check=function(){ var panel=t.closest('[role="tabpanel"]'), title=panel&&document.querySelector('.e-n-tab-title[aria-controls="'+panel.id+'"]');
       if(!title||title.getAttribute('aria-selected')==='true'||tries++>40){ run(); return; } title.click(); setTimeout(check,100); };
