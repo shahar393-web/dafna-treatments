@@ -99,9 +99,11 @@ function dt_register_widget_assets() {
 .dtlb.is-on{opacity:1}
 .dtlb-box{position:relative;background:var(--dtba-lb-fr,rgba(51,46,38,.72));color:var(--dtba-lb-tx,#F2F1EC);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid rgba(242,241,236,.14);border-radius:var(--dtba-lb-r,18px);padding:16px 16px 14px;max-width:min(1100px,100%);max-height:100%;display:flex;flex-direction:column;gap:12px;box-shadow:0 30px 80px -20px rgba(0,0,0,.45)}
 .dtlb-pair{display:flex;gap:10px;min-height:0}
-.dtlb-fig{position:relative;flex:1 1 0;margin:0;min-width:0;display:flex}
-.dtlb-fig img,.dtlb-fig canvas{display:block;width:100%;height:auto;max-height:calc(100vh - 180px);object-fit:contain;border-radius:calc(var(--dtba-lb-r,18px) - 6px);background:rgba(242,241,236,.04)}
-.dtlb-tag{position:absolute;top:10px;inset-inline-start:10px;font:600 12px/1 Assistant,sans-serif;letter-spacing:.06em;padding:6px 12px;border-radius:100px;background:rgba(242,241,236,.92);color:#2E2A24}
+.dtlb-fig{position:relative;flex:1 1 0;margin:0;min-width:0;display:flex;overflow:hidden;border-radius:calc(var(--dtba-lb-r,18px) - 6px)}
+/* איפה שהתמונה לא ממלאת את המסגרת — אותה תמונה מטושטשת מאחור, כמו בפס עצמו */
+.dtlb-fig img.dtlb-bg{position:absolute;inset:-10%;width:120%;height:120%;max-width:none;max-height:none;object-fit:cover;filter:blur(18px);opacity:.9;border-radius:0;background:none}
+.dtlb-fig img,.dtlb-fig canvas{display:block;width:100%;height:auto;max-height:calc(100vh - 180px);object-fit:contain;border-radius:calc(var(--dtba-lb-r,18px) - 6px);background:transparent;position:relative;z-index:1}
+.dtlb-tag{position:absolute;z-index:2;top:10px;inset-inline-start:10px;font:600 12px/1 Assistant,sans-serif;letter-spacing:.06em;padding:6px 12px;border-radius:100px;background:rgba(242,241,236,.92);color:#2E2A24}
 .dtlb-cap{text-align:center;font:400 16px/1.5 Assistant,sans-serif}
 .dtlb-btn{position:absolute;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:1px solid rgba(242,241,236,.5);background:transparent;color:#F2F1EC;cursor:pointer;padding:0;transition:background .3s,color .3s,border-color .3s}
 .dtlb-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
@@ -192,7 +194,7 @@ CSS);
     });
     return out;
   }
-  function fig(src,tag,deg){ return '<figure class="dtlb-fig"><img src="'+src+'" alt="'+tag+'"'+(deg?' data-deg="'+deg+'"':'')+'>'+(tag?'<span class="dtlb-tag">'+tag+'</span>':'')+'</figure>'; }
+  function fig(src,tag,deg){ return '<figure class="dtlb-fig"><img class="dtlb-bg" src="'+src+'" alt="" aria-hidden="true"><img src="'+src+'" alt="'+tag+'"'+(deg?' data-deg="'+deg+'"':'')+'>'+(tag?'<span class="dtlb-tag">'+tag+'</span>':'')+'</figure>'; }
   /* תמונה שמסובבת בכרטיס — מסובבים גם בחלון (ציור על canvas, כך שהגובה/רוחב מתחלפים נכון) */
   function turn(img){
     var deg=+img.getAttribute('data-deg'); if(!deg) return;
