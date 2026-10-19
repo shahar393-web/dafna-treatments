@@ -242,6 +242,8 @@ class DT_Brands_Widget extends DT_W_Base {
         $this->marquee_controls(30);
         $this->add_responsive_control('logo_h', ['label' => 'גובה לוגו', 'type' => CM::SLIDER, 'size_units' => ['px'], 'range' => ['px' => ['min' => 16, 'max' => 120]],
             'default' => ['unit' => 'px', 'size' => 40], 'mobile_default' => ['unit' => 'px', 'size' => 30], 'selectors' => ['{{WRAPPER}} .dtb-logo' => '--dtb-h:{{SIZE}}{{UNIT}}']]);
+        $this->add_responsive_control('logo_w', ['label' => 'רוחב קופסת לוגו (כל הלוגואים באותו גודל)', 'type' => CM::SLIDER, 'size_units' => ['px'], 'range' => ['px' => ['min' => 40, 'max' => 300]],
+            'default' => ['unit' => 'px', 'size' => 140], 'mobile_default' => ['unit' => 'px', 'size' => 100], 'selectors' => ['{{WRAPPER}} .dtb-logo' => '--dtb-w:{{SIZE}}{{UNIT}}']]);
         $this->end_controls_section();
 
         $this->start_controls_section('s', ['label' => 'עיצוב', 'tab' => CM::TAB_STYLE]);
@@ -258,7 +260,7 @@ class DT_Brands_Widget extends DT_W_Base {
         foreach ((array) ($s['items'] ?? []) as $it) {
             $id = (int) ($it['logo']['id'] ?? 0); $src = $it['logo']['url'] ?? '';
             if (!$id && !$src) continue;
-            $img = $id ? wp_get_attachment_image($id, 'medium', false, ['alt' => esc_attr($it['name'] ?? ''), 'loading' => 'lazy']) : '<img src="' . esc_url($src) . '" alt="' . esc_attr($it['name'] ?? '') . '">';
+            $img = $id ? wp_get_attachment_image($id, 'full', false, ['alt' => esc_attr($it['name'] ?? ''), 'loading' => 'eager']) : '<img src="' . esc_url($src) . '" alt="' . esc_attr($it['name'] ?? '') . '">';
             $url = $it['link']['url'] ?? '';
             $html .= $url ? '<a class="dtb-logo" href="' . esc_url($url) . '"' . (!empty($it['link']['is_external']) ? ' target="_blank" rel="noopener"' : '') . ' aria-label="' . esc_attr($it['name'] ?? '') . '">' . $img . '</a>'
                           : '<span class="dtb-logo">' . $img . '</span>';

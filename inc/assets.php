@@ -20,11 +20,11 @@ function dt_register_widget_assets() {
 .dfm.is-pause:hover .dfm-track{animation-play-state:paused}
 .dfm-set{display:flex;align-items:center;gap:var(--dfm-gap,32px);padding-inline-end:var(--dfm-gap,32px)}
 .dfm-set>*{direction:rtl;flex:0 0 auto}
-@keyframes dfm-run{to{transform:translateX(-50%)}}
+@keyframes dfm-run{to{transform:translateX(var(--dfm-to,-50%))}}
 @media (prefers-reduced-motion:reduce){.dfm-track{animation:none}}
 /* מותגים */
-.dtb-logo{display:flex;align-items:center;justify-content:center;transition:opacity .3s}
-.dtb-logo img{display:block;height:var(--dtb-h,40px);width:auto;max-width:none;object-fit:contain}
+.dtb-logo{display:flex;align-items:center;justify-content:center;transition:opacity .3s;width:var(--dtb-w,auto);height:var(--dtb-h,40px)}
+.dtb-logo img{display:block;height:100%;width:100%;max-width:none;object-fit:contain}
 /* תעודות */
 .dtc-item{display:flex;align-items:center;gap:var(--dfm-gap,32px);white-space:nowrap}
 .dtc-sep{display:inline-flex;line-height:1}
@@ -59,8 +59,7 @@ function dt_register_widget_assets() {
 .dtlb-x{top:-56px;inset-inline-start:0}
 .dtlb-prev,.dtlb-next{top:50%;transform:translateY(-50%)}
 .dtlb-prev{inset-inline-start:-60px}.dtlb-next{inset-inline-end:-60px}
-@media (max-width:880px){.dtlb{padding:72px 12px 24px}.dtlb-pair{flex-direction:column}.dtlb-fig img,.dtlb-fig canvas{max-height:calc((100vh - 220px)/2)}
-  .dtlb-prev,.dtlb-next{top:auto;bottom:-56px;transform:none}.dtlb-prev{inset-inline-start:calc(50% - 52px)}.dtlb-next{inset-inline-end:calc(50% - 52px)}}
+@media (max-width:880px){.dtlb{padding:12px}.dtlb-box{padding:10px 10px 6px;gap:6px;width:100%}.dtlb-pair{flex-direction:column;gap:6px}.dtlb-fig img,.dtlb-fig canvas{max-height:calc((100vh - 130px)/2);max-height:calc((100svh - 130px)/2)}.dtlb-cap{min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 52px;font-size:15px}.dtlb .dtlb-x,.dtlb .dtlb-x:focus{top:18px;inset-inline-end:18px;z-index:2;background:rgba(46,42,36,.55);width:36px;height:36px}.dtlb .dtlb-prev,.dtlb .dtlb-next,.dtlb .dtlb-prev:focus,.dtlb .dtlb-next:focus{top:auto;bottom:6px;transform:none;color:#2E2A24;border-color:rgba(46,42,36,.35);background:transparent}.dtlb .dtlb-prev{inset-inline-start:10px}.dtlb .dtlb-next{inset-inline-end:10px}}
 /* טאבים של טיפולים */
 .dtt-tabs{display:flex;flex-wrap:wrap}
 .dtt-tab{background:none;border:0;border-bottom:1px solid transparent;padding:0;cursor:pointer;font:inherit;color:inherit;border-radius:0;-webkit-tap-highlight-color:transparent}
@@ -167,6 +166,16 @@ CSS);
     if(!lb){ var c=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.dtba-card.is-lb'); if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();open(c);} return; }
     if(e.key==='Escape') close(); else if(e.key==='ArrowLeft') go(1); else if(e.key==='ArrowRight') go(-1);
   });
+  function fill(m){
+    var tr=m.querySelector('.dfm-track'), sets=tr&&tr.querySelectorAll('.dfm-set'); if(!sets||!sets.length) return;
+    var w=sets[0].getBoundingClientRect().width; if(!w) return;
+    var need=Math.ceil(m.getBoundingClientRect().width/w)+1;
+    for(var i=sets.length;i<need;i++){ var c=sets[sets.length-1].cloneNode(true); c.setAttribute('aria-hidden','true'); c.querySelectorAll('a').forEach(function(a){a.tabIndex=-1;}); tr.appendChild(c); }
+    m.style.setProperty('--dfm-to',(-w)+'px');
+  }
+  function fillAll(){ document.querySelectorAll('.dfm').forEach(fill); }
+  window.addEventListener('load',fillAll); window.addEventListener('resize',fillAll);
+  if(document.readyState!=='loading') fillAll(); else document.addEventListener('DOMContentLoaded',fillAll);
   /* בעורך של אלמנטור הווידג'ט נטען מחדש בכל שינוי — מאתחלים שוב */
   if(window.jQuery) jQuery(window).on('elementor/frontend/init',function(){
     if(window.elementorFrontend&&elementorFrontend.hooks) elementorFrontend.hooks.addAction('frontend/element_ready/dt_before_after.default',function(s){init(s[0]||s);});
