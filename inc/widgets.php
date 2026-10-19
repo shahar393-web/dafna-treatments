@@ -192,9 +192,9 @@ class DT_Before_After_Widget extends DT_W_Base {
 
         // לייטבוקס הזוג — הערכים נקראים מהווידג'ט ונכנסים לחלון (משתני CSS)
         $this->start_controls_section('s_lb', ['label' => 'לייטבוקס', 'tab' => CM::TAB_STYLE, 'condition' => ['lightbox' => 'yes']]);
-        $this->add_control('lb_bg', ['label' => 'רקע מאחור', 'type' => CM::COLOR, 'default' => 'rgba(46,42,36,.92)', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-bg:{{VALUE}}']]);
-        $this->add_control('lb_fr', ['label' => 'מסגרת', 'type' => CM::COLOR, 'default' => '#F2F1EC', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-fr:{{VALUE}}']]);
-        $this->add_control('lb_tx', ['label' => 'צבע הטקסט', 'type' => CM::COLOR, 'default' => '#2E2A24', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-tx:{{VALUE}}']]);
+        $this->add_control('lb_bg', ['label' => 'רקע מאחור', 'type' => CM::COLOR, 'default' => 'rgba(20,18,15,0.55)', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-bg:{{VALUE}}']]);
+        $this->add_control('lb_fr', ['label' => 'מסגרת (זכוכית)', 'type' => CM::COLOR, 'default' => 'rgba(51,46,38,0.72)', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-fr:{{VALUE}}']]);
+        $this->add_control('lb_tx', ['label' => 'צבע הטקסט', 'type' => CM::COLOR, 'default' => '#F2F1EC', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-tx:{{VALUE}}']]);
         $this->add_control('lb_r', ['label' => 'פינות', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 18], 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-r:{{SIZE}}{{UNIT}}']]);
         $this->end_controls_section();
     }

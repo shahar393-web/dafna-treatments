@@ -82,6 +82,7 @@ function dts_register_widget_assets() {
 .dfm[data-dir="right"] .dfm-track{animation-direction:reverse}
 /* הפס עומד עד שהסקריפט מדד כמה לזוז — אחרת הוא מתחיל בערך זמני וקופץ כשהמדידה מגיעה */
 .dfm:not(.is-on) .dfm-track{animation-play-state:paused}
+.dfm{transition:opacity .45s ease}.dfm:not(.is-on){opacity:0}
 @media (hover:hover){.dfm.is-pause:hover .dfm-track{animation-play-state:paused}}
 .dfm-set{display:flex;align-items:center;gap:var(--dfm-gap,32px);padding-inline-end:var(--dfm-gap,32px)}
 .dfm-set>*{direction:rtl;flex:0 0 auto}
@@ -110,12 +111,12 @@ function dts_register_widget_assets() {
 .dtba-card.is-lb{cursor:zoom-in}
 .dtba-card.is-lb:focus-visible{outline:1px solid currentColor;outline-offset:4px}
 /* לייטבוקס הזוג: רקע חום, מסגרת שמנת, שתי התמונות זו לצד זו (מובייל: זו מעל זו) */
-.dtlb{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--dtba-lb-bg,rgba(46,42,36,.92));opacity:0;transition:opacity .25s;direction:rtl}
+.dtlb{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--dtba-lb-bg,rgba(20,18,15,.55));-webkit-backdrop-filter:blur(14px) saturate(1.1);backdrop-filter:blur(14px) saturate(1.1);opacity:0;transition:opacity .25s;direction:rtl}
 .dtlb.is-on{opacity:1}
-.dtlb-box{position:relative;background:var(--dtba-lb-fr,#F2F1EC);color:var(--dtba-lb-tx,#2E2A24);border-radius:var(--dtba-lb-r,18px);padding:16px 16px 14px;max-width:min(1100px,100%);max-height:100%;display:flex;flex-direction:column;gap:12px;box-shadow:0 30px 80px -20px rgba(0,0,0,.45)}
+.dtlb-box{position:relative;background:var(--dtba-lb-fr,rgba(51,46,38,.72));color:var(--dtba-lb-tx,#F2F1EC);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid rgba(242,241,236,.14);border-radius:var(--dtba-lb-r,18px);padding:16px 16px 14px;max-width:min(1100px,100%);max-height:100%;display:flex;flex-direction:column;gap:12px;box-shadow:0 30px 80px -20px rgba(0,0,0,.45)}
 .dtlb-pair{display:flex;gap:10px;min-height:0}
 .dtlb-fig{position:relative;flex:1 1 0;margin:0;min-width:0;display:flex}
-.dtlb-fig img,.dtlb-fig canvas{display:block;width:100%;height:auto;max-height:calc(100vh - 180px);object-fit:contain;border-radius:calc(var(--dtba-lb-r,18px) - 6px);background:rgba(46,42,36,.06)}
+.dtlb-fig img,.dtlb-fig canvas{display:block;width:100%;height:auto;max-height:calc(100vh - 180px);object-fit:contain;border-radius:calc(var(--dtba-lb-r,18px) - 6px);background:rgba(242,241,236,.04)}
 .dtlb-tag{position:absolute;top:10px;inset-inline-start:10px;font:600 12px/1 Assistant,sans-serif;letter-spacing:.06em;padding:6px 12px;border-radius:100px;background:rgba(242,241,236,.92);color:#2E2A24}
 .dtlb-cap{text-align:center;font:400 16px/1.5 Assistant,sans-serif}
 .dtlb-btn{position:absolute;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:1px solid rgba(242,241,236,.5);background:transparent;color:#F2F1EC;cursor:pointer;padding:0;transition:background .3s,color .3s,border-color .3s}
@@ -126,7 +127,7 @@ function dts_register_widget_assets() {
 .dtlb-x{top:-56px;inset-inline-start:0}
 .dtlb-prev,.dtlb-next{top:50%;transform:translateY(-50%)}
 .dtlb-prev{inset-inline-start:-60px}.dtlb-next{inset-inline-end:-60px}
-@media (max-width:880px){.dtlb{padding:12px}.dtlb-box{padding:10px 10px 6px;gap:6px;width:100%}.dtlb-pair{flex-direction:column;gap:6px}.dtlb-fig img,.dtlb-fig canvas{max-height:calc((100vh - 130px)/2);max-height:calc((100svh - 130px)/2)}.dtlb-cap{min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 52px;font-size:15px}.dtlb .dtlb-x,.dtlb .dtlb-x:focus{top:18px;left:18px;right:auto;z-index:2;background:rgba(46,42,36,.55);width:36px;height:36px}.dtlb .dtlb-prev,.dtlb .dtlb-next,.dtlb .dtlb-prev:focus,.dtlb .dtlb-next:focus{top:auto;bottom:6px;transform:none;color:#2E2A24;border-color:rgba(46,42,36,.35);background:transparent}.dtlb .dtlb-prev{inset-inline-start:10px}.dtlb .dtlb-next{inset-inline-end:10px}}
+@media (max-width:880px){.dtlb{padding:12px}.dtlb-box{padding:10px 10px 6px;gap:6px;width:100%}.dtlb-pair{flex-direction:column;gap:6px}.dtlb-fig img,.dtlb-fig canvas{max-height:calc((100vh - 130px)/2);max-height:calc((100svh - 130px)/2)}.dtlb-cap{min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 52px;font-size:15px}.dtlb .dtlb-x,.dtlb .dtlb-x:focus{top:18px;left:18px;right:auto;z-index:2;background:rgba(46,42,36,.55);width:36px;height:36px}.dtlb .dtlb-prev,.dtlb .dtlb-next,.dtlb .dtlb-prev:focus,.dtlb .dtlb-next:focus{top:auto;bottom:6px;transform:none;color:#F2F1EC;border-color:rgba(242,241,236,.45);background:transparent}.dtlb .dtlb-prev{inset-inline-start:10px}.dtlb .dtlb-next{inset-inline-end:10px}}
 /* טאבים של טיפולים */
 .dtt-tabs{display:flex;flex-wrap:wrap}
 .dtt-tab{background:none;border:0;border-bottom:1px solid transparent;padding:0;cursor:pointer;font:inherit;color:inherit;border-radius:0;-webkit-tap-highlight-color:transparent}
@@ -522,9 +523,9 @@ class DTS_Before_After_Widget extends DTS_W_Base {
 
         // לייטבוקס הזוג — הערכים נקראים מהווידג'ט ונכנסים לחלון (משתני CSS)
         $this->start_controls_section('s_lb', ['label' => 'לייטבוקס', 'tab' => CM::TAB_STYLE, 'condition' => ['lightbox' => 'yes']]);
-        $this->add_control('lb_bg', ['label' => 'רקע מאחור', 'type' => CM::COLOR, 'default' => 'rgba(46,42,36,.92)', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-bg:{{VALUE}}']]);
-        $this->add_control('lb_fr', ['label' => 'מסגרת', 'type' => CM::COLOR, 'default' => '#F2F1EC', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-fr:{{VALUE}}']]);
-        $this->add_control('lb_tx', ['label' => 'צבע הטקסט', 'type' => CM::COLOR, 'default' => '#2E2A24', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-tx:{{VALUE}}']]);
+        $this->add_control('lb_bg', ['label' => 'רקע מאחור', 'type' => CM::COLOR, 'default' => 'rgba(20,18,15,0.55)', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-bg:{{VALUE}}']]);
+        $this->add_control('lb_fr', ['label' => 'מסגרת (זכוכית)', 'type' => CM::COLOR, 'default' => 'rgba(51,46,38,0.72)', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-fr:{{VALUE}}']]);
+        $this->add_control('lb_tx', ['label' => 'צבע הטקסט', 'type' => CM::COLOR, 'default' => '#F2F1EC', 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-tx:{{VALUE}}']]);
         $this->add_control('lb_r', ['label' => 'פינות', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 18], 'selectors' => ['{{WRAPPER}}' => '--dtba-lb-r:{{SIZE}}{{UNIT}}']]);
         $this->end_controls_section();
     }
