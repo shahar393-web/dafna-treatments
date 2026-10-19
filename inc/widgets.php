@@ -538,9 +538,8 @@ class DT_Treatment_Cards_Widget extends DT_W_Base {
             if (get_post_type($id) !== DT_CPT || get_post_status($id) !== 'publish') continue;
             $eb = dt_get($id, 'eyebrow');
             $desc = (int) $s['words'] ? wp_trim_words(dt_get($id, 'summary'), (int) $s['words'], '…') : '';
-            $img = has_post_thumbnail($id)
-                ? get_the_post_thumbnail($id, 'large', ['loading' => 'lazy', 'alt' => esc_attr(get_the_title($id))])
-                : '';
+            $ci = function_exists('dt_card_image_id') ? dt_card_image_id($id) : (int) get_post_thumbnail_id($id);   // תמונה לכרטיס, ואם אין — הראשית
+            $img = $ci ? wp_get_attachment_image($ci, 'large', false, ['loading' => 'lazy', 'alt' => esc_attr(get_the_title($id))]) : '';
             echo '<a class="dtk-card" href="' . esc_url(get_permalink($id)) . '"><span class="dtk-img">' . $img . '</span><span class="dtk-panel">'
                . ($eb ? '<span class="dtk-eb">' . esc_html($eb) . '</span>' : '')
                . '<span class="dtk-title">' . esc_html(get_the_title($id)) . '</span>'

@@ -26,6 +26,51 @@ add_action('wp_enqueue_scripts', 'dts_register_widget_assets', 5);
 add_action('elementor/frontend/after_register_scripts', 'dts_register_widget_assets');
 // נטען בכל עמוד (קטן): גם עמודים בלי ווידג'ט שלנו צריכים את הגלילה לעוגן אחרי טעינה (למשל החנות מהתפריט)
 add_action('wp_enqueue_scripts', function () { wp_enqueue_script('dt-widgets'); wp_enqueue_style('dt-widgets'); }, 20);
+
+/* ═════ תמונה לכרטיס בעמוד הטיפולים (נפרדת מהתמונה הראשית של עמוד הטיפול) ═════
+   ריק = משתמשים בתמונה הראשית, כמו קודם. */
+function dt_card_image_id($post_id) {
+    $id = (int) get_post_meta($post_id, '_dt_card_image', true);
+    return $id ?: (int) get_post_thumbnail_id($post_id);
+}
+add_action('add_meta_boxes', function () {
+    add_meta_box('dt_card_image', 'תמונה לכרטיס בעמוד הטיפולים', function ($post) {
+        $id = (int) get_post_meta($post->ID, '_dt_card_image', true);
+        wp_nonce_field('dt_card_image', 'dt_card_image_nonce');
+        echo '<div id="dt-ci-wrap"><div id="dt-ci-prev" style="margin-bottom:8px">' . ($id ? wp_get_attachment_image($id, 'medium', false, ['style' => 'max-width:100%;height:auto;border-radius:8px']) : '') . '</div>';
+        echo '<input type="hidden" name="dt_card_image" id="dt-ci" value="' . esc_attr($id ?: '') . '">';
+        echo '<button type="button" class="button" id="dt-ci-pick">בחירת תמונה</button> <button type="button" class="button-link" id="dt-ci-clear"' . ($id ? '' : ' style="display:none"') . '>הסרה</button>';
+        echo '<p class="description">מופיעה בכרטיס של הטיפול בעמוד הטיפולים. ריק = התמונה הראשית של הטיפול.</p></div>';
+        echo "<script>jQuery(function($){var f;$('#dt-ci-pick').on('click',function(e){e.preventDefault();if(f){f.open();return;}f=wp.media({title:'תמונה לכרטיס',button:{text:'בחירה'},multiple:false,library:{type:'image'}});f.on('select',function(){var a=f.state().get('selection').first().toJSON();$('#dt-ci').val(a.id);$('#dt-ci-prev').html('<img src=\"'+(a.sizes&&a.sizes.medium?a.sizes.medium.url:a.url)+'\" style=\"max-width:100%;height:auto;border-radius:8px\">');$('#dt-ci-clear').show();});f.open();});$('#dt-ci-clear').on('click',function(e){e.preventDefault();$('#dt-ci').val('');$('#dt-ci-prev').empty();$(this).hide();});});</script>";
+    }, DT_CPT, 'side', 'low');
+});
+add_action('admin_enqueue_scripts', function ($hook) {
+    if (in_array($hook, ['post.php', 'post-new.php'], true) && get_post_type() === DT_CPT) wp_enqueue_media();
+});
+add_action('save_post_' . DT_CPT, function ($post_id) {
+    if (!isset($_POST['dt_card_image_nonce']) || !wp_verify_nonce($_POST['dt_card_image_nonce'], 'dt_card_image')) return;
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+    $v = (int) ($_POST['dt_card_image'] ?? 0);
+    $v ? update_post_meta($post_id, '_dt_card_image', $v) : delete_post_meta($post_id, '_dt_card_image');
+});
+/* תגית דינמית לאלמנטור: "Dafna · תמונת כרטיס" (התמונה לכרטיס, ואם אין — הראשית) */
+add_action('elementor/dynamic_tags/register', function ($tags) {
+    if (!class_exists('\Elementor\Core\DynamicTags\Data_Tag')) return;
+    if (!class_exists('DTS_Card_Image_Tag')) {
+        class DTS_Card_Image_Tag extends \Elementor\Core\DynamicTags\Data_Tag {
+            public function get_name() { return 'dt-card-image'; }
+            public function get_title() { return 'Dafna · תמונת כרטיס'; }
+            public function get_group() { return 'site'; }
+            public function get_categories() { return [\Elementor\Modules\DynamicTags\Module::IMAGE_CATEGORY]; }
+            public function get_value(array $options = []) {
+                $id = dt_card_image_id(get_the_ID());
+                return $id ? ['id' => $id, 'url' => wp_get_attachment_image_url($id, 'full')] : [];
+            }
+        }
+    }
+    $tags->register(new DTS_Card_Image_Tag());
+});
 function dts_register_widget_assets() {
     if (wp_style_is('dt-widgets', 'registered')) return;
     wp_register_style('dt-widgets', false, [], DT_VER);
@@ -813,9 +858,8 @@ class DTS_Treatment_Cards_Widget extends DTS_W_Base {
             if (get_post_type($id) !== DT_CPT || get_post_status($id) !== 'publish') continue;
             $eb = dt_get($id, 'eyebrow');
             $desc = (int) $s['words'] ? wp_trim_words(dt_get($id, 'summary'), (int) $s['words'], '…') : '';
-            $img = has_post_thumbnail($id)
-                ? get_the_post_thumbnail($id, 'large', ['loading' => 'lazy', 'alt' => esc_attr(get_the_title($id))])
-                : '';
+            $ci = function_exists('dt_card_image_id') ? dt_card_image_id($id) : (int) get_post_thumbnail_id($id);   // תמונה לכרטיס, ואם אין — הראשית
+            $img = $ci ? wp_get_attachment_image($ci, 'large', false, ['loading' => 'lazy', 'alt' => esc_attr(get_the_title($id))]) : '';
             echo '<a class="dtk-card" href="' . esc_url(get_permalink($id)) . '"><span class="dtk-img">' . $img . '</span><span class="dtk-panel">'
                . ($eb ? '<span class="dtk-eb">' . esc_html($eb) . '</span>' : '')
                . '<span class="dtk-title">' . esc_html(get_the_title($id)) . '</span>'
