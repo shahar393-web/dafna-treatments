@@ -210,11 +210,20 @@ CSS);
     m.style.setProperty('--dfm-to',(-w)+'px');
   }
   /* קישור לעוגן מעמוד אחר (למשל קטגוריה בחנות מהתפריט): אחרי שהעמוד נטען במלואו גוללים שוב לעוגן, כי התוכן שמעליו גדל בזמן הטעינה */
-  window.addEventListener('load',function(){
-    if(!location.hash||location.hash.length<2) return;
-    var t=null; try{ t=document.getElementById(decodeURIComponent(location.hash.slice(1))); }catch(e){}
-    if(t) setTimeout(function(){ t.scrollIntoView({block:'start'}); },60);
-  });
+  function hashTarget(h){ if(!h||h.length<2) return null; try{ return document.getElementById(decodeURIComponent(h.slice(1))); }catch(e){ return null; } }
+  function jump(t,smooth){ if(t) t.scrollIntoView({block:'start',behavior:smooth?'smooth':'auto'}); }
+  /* כניסה מעמוד אחר: קפיצה מיד כשהעמוד מוכן, ותיקון אחד אחרי שהכול נטען (אם התוכן שמעל זז) */
+  document.addEventListener('DOMContentLoaded',function(){ jump(hashTarget(location.hash),false); });
+  window.addEventListener('load',function(){ var t=hashTarget(location.hash); if(t&&Math.abs(t.getBoundingClientRect().top-90)>6) setTimeout(function(){ jump(t,false); },40); });
+  /* קישור לעוגן באותו עמוד מתוך תפריט המובייל: סוגרים את התפריט ואז גוללים בעדינות (אחרת העמוד נתקע מאחורי התפריט) */
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('a[href*="#"]'); if(!a||a.pathname!==location.pathname||a.hash.length<2) return;
+    var t=hashTarget(a.hash); if(!t) return;
+    var oc=a.closest('.e-off-canvas');
+    e.preventDefault(); history.replaceState(null,'',a.hash);
+    if(oc){ var x=oc.querySelector('a[href*="off_canvas"][href*="close"]'); if(x) x.click(); setTimeout(function(){ jump(t,true); },420); }
+    else jump(t,true);
+  },true);
   /* סינון קטגוריות: מסתיר/מציג פריטים ברשת לפי המחלקה product_cat-<slug> */
   document.addEventListener('click',function(e){
     var b=e.target.closest&&e.target.closest('.dtf-b'); if(!b) return;
