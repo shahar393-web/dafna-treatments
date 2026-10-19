@@ -217,7 +217,7 @@ CSS);
   ['wheel','touchmove','keydown'].forEach(function(ev){ window.addEventListener(ev,function(){ pinStop=true; },{passive:true}); });
   /* כמה מקום תופס ההדר הקבוע בפועל (כולל סרגל הניהול של וורדפרס כשמחוברים) + 28 מרווח */
   function offTop(){ var m=0; document.querySelectorAll('[data-elementor-type="header"] .e-con, #wpadminbar').forEach(function(el){ if(el.closest('.elementor-sticky__spacer')) return; var c=getComputedStyle(el), r=el.getBoundingClientRect(); if((c.position==='fixed'||c.position==='sticky'||el.id==='wpadminbar')&&r.top<=1&&r.bottom>m&&r.bottom<300) m=r.bottom; }); return (m||64)+28; }
-  function pin(){ if(pinStop||!pinT||Date.now()>pinUntil) return; var d=pinT.getBoundingClientRect().top-offTop(); if(Math.abs(d)>3) window.scrollTo({top:window.scrollY+d,behavior:'instant'}); requestAnimationFrame(pin); }
+  function pin(){ if(pinStop||!pinT||Date.now()>pinUntil) return; var d=pinT.getBoundingClientRect().top-offTop(); if(Math.abs(d)>3) window.scrollTo({top:window.scrollY+d,behavior:'instant'}); setTimeout(pin,30); }
   /* עוגן שנמצא בתוך טאב סגור (למשל קטגוריה של Noon בחנות): פותחים קודם את הטאב שלו.
      עוגן של מותג שלם (הדבר הראשון בטאב) — גוללים לשורת הטאבים עצמה, כדי שרואים איזה מותג פתוח */
   function openTab(t){
@@ -229,7 +229,7 @@ CSS);
     return {t:t,switched:sw};
   }
   function goTo(t,ms){ if(!t) return; var o=openTab(t), tries=0;
-    var run=function(){ pinT=o.t; pinStop=false; pinUntil=Date.now()+(ms||1500); window.scrollTo({top:window.scrollY+o.t.getBoundingClientRect().top-offTop(),behavior:'instant'}); requestAnimationFrame(pin); };
+    var run=function(){ pinT=o.t; pinStop=false; pinUntil=Date.now()+(ms||1500); window.scrollTo({top:window.scrollY+o.t.getBoundingClientRect().top-offTop(),behavior:'instant'}); setTimeout(pin,30); };
     /* בכניסה לעמוד הטאבים של אלמנטור עוד לא מוכנים ללחיצה — מנסים שוב עד שהטאב באמת נפתח (עד 4 שניות) */
     var check=function(){ var panel=t.closest('[role="tabpanel"]'), title=panel&&document.querySelector('.e-n-tab-title[aria-controls="'+panel.id+'"]');
       if(!title||title.getAttribute('aria-selected')==='true'||tries++>40){ run(); return; } title.click(); setTimeout(check,100); };
@@ -237,7 +237,7 @@ CSS);
   /* כניסה מעמוד אחר עם עוגן בכתובת */
   function onReady(){ goTo(hashTarget(location.hash),4000); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',onReady); else onReady();
-  window.addEventListener('load',function(){ if(pinT&&!pinStop){ pinUntil=Math.max(pinUntil,Date.now()+1200); requestAnimationFrame(pin); } });
+  window.addEventListener('load',function(){ if(pinT&&!pinStop){ pinUntil=Math.max(pinUntil,Date.now()+1200); setTimeout(pin,30); } });
   /* עוגן באותו עמוד (מהתפריט במחשב או בטלפון) */
   document.addEventListener('click',function(e){
     var a=e.target.closest&&e.target.closest('a[href*="#"]'); if(!a||a.pathname!==location.pathname||a.hash.length<2) return;
