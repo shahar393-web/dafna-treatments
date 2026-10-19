@@ -58,7 +58,7 @@ function dts_register_widget_assets() {
 .dtba-frame.is-cw img.dtba-main,.dtba-frame.is-ccw img.dtba-main{inset:auto;top:50%;left:50%;width:100cqh;height:100cqw}
 .dtba-frame.is-cw img.dtba-main{transform:translate(-50%,-50%) rotate(90deg)}
 .dtba-frame.is-ccw img.dtba-main{transform:translate(-50%,-50%) rotate(-90deg)}
-.dtba-lbl{position:absolute;bottom:10px;inset-inline-start:10px;line-height:1.4}
+.dtba-lbl{position:absolute;bottom:10px;inset-inline-start:10px;line-height:1.4;z-index:2}
 .dtba-cap{display:block}
 .dtba-card.is-lb{cursor:zoom-in}
 .dtba-card.is-lb:focus-visible{outline:1px solid currentColor;outline-offset:4px}
@@ -430,7 +430,7 @@ class DTS_Before_After_Widget extends DTS_W_Base {
             'default' => ['unit' => 'px', 'size' => 560], 'tablet_default' => ['unit' => 'px', 'size' => 420], 'mobile_default' => ['unit' => 'px', 'size' => 300],
             'selectors' => ['{{WRAPPER}} .dtba-card' => '--dtba-w:{{SIZE}}{{UNIT}}']]);
         $this->add_control('ratio', ['label' => 'יחס כל תמונה', 'type' => CM::SELECT, 'default' => '3/4',
-            'options' => ['3/4' => '3:4 (לאורך)', '4/5' => '4:5', '2/3' => '2:3 (גבוה)', '1/1' => 'ריבוע'], 'selectors' => ['{{WRAPPER}} .dtba-frame' => '--dtba-ratio:{{VALUE}}']]);
+            'options' => ['8/9' => '8:9 (כמו התמונות שלנו)', '3/4' => '3:4 (לאורך)', '4/5' => '4:5', '2/3' => '2:3 (גבוה)', '1/1' => 'ריבוע'], 'selectors' => ['{{WRAPPER}} .dtba-frame' => '--dtba-ratio:{{VALUE}}']]);
         $this->add_control('fit', ['label' => 'התאמת התמונה', 'type' => CM::SELECT, 'default' => 'blur',
             'options' => ['blur' => 'כל התמונה + רקע מטושטש', 'cover' => 'ממלאת את המסגרת (נחתכת)'], 'selectors_dictionary' => ['blur' => 'contain', 'cover' => 'cover'],
             'selectors' => ['{{WRAPPER}} .dtba-main' => 'object-fit:{{VALUE}}']]);

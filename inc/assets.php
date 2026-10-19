@@ -42,7 +42,7 @@ function dt_register_widget_assets() {
 .dtba-frame.is-cw img.dtba-main,.dtba-frame.is-ccw img.dtba-main{inset:auto;top:50%;left:50%;width:100cqh;height:100cqw}
 .dtba-frame.is-cw img.dtba-main{transform:translate(-50%,-50%) rotate(90deg)}
 .dtba-frame.is-ccw img.dtba-main{transform:translate(-50%,-50%) rotate(-90deg)}
-.dtba-lbl{position:absolute;bottom:10px;inset-inline-start:10px;line-height:1.4}
+.dtba-lbl{position:absolute;bottom:10px;inset-inline-start:10px;line-height:1.4;z-index:2}
 .dtba-cap{display:block}
 .dtba-card.is-lb{cursor:zoom-in}
 .dtba-card.is-lb:focus-visible{outline:1px solid currentColor;outline-offset:4px}
