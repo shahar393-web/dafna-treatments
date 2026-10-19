@@ -476,6 +476,10 @@ class DT_Treatment_Cards_Widget extends DT_W_Base {
 
         $this->start_controls_section('s_card', ['label' => 'כרטיס', 'tab' => CM::TAB_STYLE]);
         $this->add_control('cbg', ['label' => 'רקע הכרטיס', 'type' => CM::COLOR, 'default' => '#FFFFFF', 'selectors' => ['{{WRAPPER}} .dtk-card' => 'background-color:{{VALUE}}']]);
+        $this->add_control('glass', ['label' => 'אפקט זכוכית מאירה', 'type' => CM::SWITCHER, 'default' => '', 'prefix_class' => 'dtk-glass-',
+            'description' => 'כרטיס שקוף-למחצה עם טשטוש, כתמי אור רכים מאחור ופס אור שעובר על הכרטיס']);
+        $this->add_control('glow', ['label' => 'צבע כתמי האור', 'type' => CM::COLOR, 'default' => 'rgba(184,169,146,0.55)', 'condition' => ['glass' => 'yes'],
+            'selectors' => ['{{WRAPPER}}' => '--dtk-glow:{{VALUE}}']]);
         $this->add_responsive_control('r', ['label' => 'פינות', 'type' => CM::SLIDER, 'default' => ['unit' => 'px', 'size' => 12], 'selectors' => ['{{WRAPPER}} .dtk-card' => 'border-radius:{{SIZE}}{{UNIT}}']]);
         $this->add_responsive_control('cp', ['label' => 'ריפוד הכרטיס', 'type' => CM::SLIDER, 'range' => ['px' => ['min' => 0, 'max' => 40]], 'selectors' => ['{{WRAPPER}} .dtk-card' => 'padding:{{SIZE}}{{UNIT}}']]);
         $this->add_responsive_control('ir', ['label' => 'פינות התמונה', 'type' => CM::SLIDER, 'range' => ['px' => ['min' => 0, 'max' => 40]], 'selectors' => ['{{WRAPPER}} .dtk-img' => 'border-radius:{{SIZE}}{{UNIT}}']]);

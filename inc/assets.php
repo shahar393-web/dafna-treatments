@@ -81,6 +81,17 @@ function dt_register_widget_assets() {
 .dtk-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none;transition:transform .6s ease}
 .dtk.is-zoom .dtk-card:hover .dtk-img img{transform:scale(1.04)}
 .dtk-panel{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px}
+/* זכוכית מאירה: כתמי אור מאחור, כרטיס שקוף-למחצה עם טשטוש, ופס אור שעובר מדי פעם */
+.dtk-glass-yes .dtk{position:relative;isolation:isolate}
+.dtk-glass-yes .dtk::before{content:"";position:absolute;inset:-12% -6%;z-index:-1;pointer-events:none;filter:blur(36px);
+  background:radial-gradient(38% 52% at 18% 35%,var(--dtk-glow,rgba(184,169,146,.55)),transparent 70%),radial-gradient(34% 48% at 82% 65%,var(--dtk-glow,rgba(184,169,146,.55)),transparent 70%),radial-gradient(30% 42% at 52% 15%,rgba(255,255,255,.9),transparent 70%);
+  animation:dtk-float 16s ease-in-out infinite alternate}
+@keyframes dtk-float{to{transform:translate3d(3%,-4%,0) scale(1.06)}}
+.dtk-glass-yes .dtk-card{background-color:rgba(255,255,255,.42)!important;-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border:1px solid rgba(255,255,255,.75);box-shadow:0 24px 50px -28px rgba(46,42,36,.4),inset 0 1px 0 rgba(255,255,255,.95)}
+.dtk-glass-yes .dtk-card::after{content:"";position:absolute;top:-40%;bottom:-40%;left:-70%;width:45%;z-index:2;pointer-events:none;transform:skewX(-18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);animation:dtk-shine 7s ease-in-out infinite}
+.dtk-glass-yes .dtk-card:nth-child(2)::after{animation-delay:1.2s}.dtk-glass-yes .dtk-card:nth-child(3)::after{animation-delay:2.4s}.dtk-glass-yes .dtk-card:nth-child(4)::after{animation-delay:3.6s}
+@keyframes dtk-shine{0%,72%{left:-70%}100%{left:135%}}
+@media (prefers-reduced-motion:reduce){.dtk-glass-yes .dtk::before,.dtk-glass-yes .dtk-card::after{animation:none}}
 .dtk-eb{letter-spacing:.1em;font-size:11px}
 .dtk-title{font-size:20px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .dtk-desc{font-size:14px;line-height:1.6;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
