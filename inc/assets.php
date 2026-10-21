@@ -71,6 +71,11 @@ function dt_register_widget_assets() {
 .dfm-set{display:flex;align-items:center;gap:var(--dfm-gap,32px);padding-inline-end:var(--dfm-gap,32px)}
 .dfm-set>*{direction:rtl;flex:0 0 auto}
 @keyframes dfm-run{to{transform:translateX(var(--dfm-to,-50%))}}
+/* לפני ואחרי: התנועה בסקריפט כדי שאפשר לגרור ביד בלי שהרצועה תעצור */
+.dfm.is-drag .dfm-track{animation:none}
+.dfm.is-drag{touch-action:pan-y;cursor:grab;-webkit-user-select:none;user-select:none}
+.dfm.is-drag.is-down{cursor:grabbing}
+.dfm.is-drag img{-webkit-user-drag:none;pointer-events:none}
 @media (prefers-reduced-motion:reduce){.dfm-track{animation:none}}
 /* מותגים */
 .dtb-logo{display:flex;align-items:center;justify-content:center;transition:opacity .3s;width:var(--dtb-w,auto);height:var(--dtb-h,40px)}
@@ -243,6 +248,27 @@ CSS);
     var to=(-Math.round(w*100)/100)+'px';
     if(m.style.getPropertyValue('--dfm-to')!==to) m.style.setProperty('--dfm-to',to);   // רק אם השתנה — שינוי באמצע תנועה גורם לקפיצה
     if(!m.classList.contains('is-on')) requestAnimationFrame(function(){ m.classList.add('is-on'); });
+    if(m.classList.contains('dtba')) drag(m);
+  }
+  /* לפני ואחרי: הרצועה ממשיכה לזוז כל הזמן, ואפשר לגרור אותה ביד (עכבר או אצבע). אחרי שחרור היא ממשיכה מאותה נקודה עם תנופה קטנה.
+     גרירה לא פותחת את הלייטבוקס — רק נגיעה קצרה */
+  function drag(m){
+    if(m._dg) return; m._dg=1; m.classList.add('is-drag');
+    var tr=m.querySelector('.dfm-track'), pos=0, last=0, down=false, px=0, lt=0, moved=0, v=0, sup=0;
+    var rev=m.getAttribute('data-dir')==='right', hov=window.matchMedia('(hover:hover)').matches&&m.classList.contains('is-pause');
+    function W(){ var s=tr.querySelector('.dfm-set'); return s?s.getBoundingClientRect().width:0; }
+    function step(t){ var w=W(), dt=last?Math.min(t-last,64):0; last=t;
+      if(w){ var dur=parseFloat(getComputedStyle(m).getPropertyValue('--dfm-dur'))||40;
+        if(!down){ if(!(hov&&m.matches(':hover'))) pos+=(rev?1:-1)*w/dur*dt/1000; pos+=v*dt; v*=Math.pow(.94,dt/16); if(Math.abs(v)<.005) v=0; }
+        pos=((pos%w)-w)%w; tr.style.transform='translate3d('+pos+'px,0,0)'; }
+      requestAnimationFrame(step); }
+    requestAnimationFrame(step);
+    m.addEventListener('dragstart',function(e){ e.preventDefault(); });
+    m.addEventListener('pointerdown',function(e){ if(e.button) return; down=true; px=e.clientX; lt=performance.now(); moved=0; v=0; m.classList.add('is-down'); });
+    window.addEventListener('pointermove',function(e){ if(!down) return; var dx=e.clientX-px, now=performance.now(); pos+=dx; moved+=Math.abs(dx); v=dx/Math.max(now-lt,8); px=e.clientX; lt=now; });
+    var up=function(){ if(!down) return; down=false; m.classList.remove('is-down'); if(performance.now()-lt>80) v=0; v=Math.max(-2,Math.min(2,v)); if(moved>6) sup=Date.now(); };
+    window.addEventListener('pointerup',up); window.addEventListener('pointercancel',up);
+    m.addEventListener('click',function(e){ if(Date.now()-sup<400){ e.preventDefault(); e.stopPropagation(); } },true);
   }
   /* קישור לעוגן מעמוד אחר (למשל קטגוריה בחנות מהתפריט): אחרי שהעמוד נטען במלואו גוללים שוב לעוגן, כי התוכן שמעליו גדל בזמן הטעינה */
   /* מעבר לעוגן (למשל קטגוריה בחנות מהתפריט): קפיצה מיידית, ואז "הצמדה" קצרה — בזמן שתמונות נטענות התוכן שמעל גדל ודוחף את העוגן.
