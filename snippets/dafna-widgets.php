@@ -27,6 +27,18 @@ add_action('elementor/frontend/after_register_scripts', 'dts_register_widget_ass
 // נטען בכל עמוד (קטן): גם עמודים בלי ווידג'ט שלנו צריכים את הגלילה לעוגן אחרי טעינה (למשל החנות מהתפריט)
 add_action('wp_enqueue_scripts', function () { wp_enqueue_script('dt-widgets'); wp_enqueue_style('dt-widgets'); }, 20);
 
+/* חיפוש מוצרים גם לפי מותג וקטגוריה (למשל "bio" מחזיר את כל מוצרי Biofor) — לחיפוש של וורדפרס אין אפשרות כזו */
+add_filter('posts_search', function ($search, $q) {
+    $s = trim((string) $q->get('s'));
+    if ($search === '' || $s === '' || is_admin() && !wp_doing_ajax() && !(defined('REST_REQUEST') && REST_REQUEST)) return $search;
+    $pt = (array) $q->get('post_type');
+    if (!array_intersect($pt, ['product', 'any'])) return $search;
+    global $wpdb; $like = '%' . $wpdb->esc_like($s) . '%';
+    $ids = $wpdb->get_col($wpdb->prepare("SELECT DISTINCT tr.object_id FROM {$wpdb->term_relationships} tr JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id JOIN {$wpdb->terms} t ON t.term_id = tt.term_id WHERE tt.taxonomy = 'product_cat' AND (t.name LIKE %s OR t.slug LIKE %s)", $like, $like));
+    if (!$ids) return $search;
+    return preg_replace('/^\s*AND\s*\(/', " AND ( {$wpdb->posts}.ID IN (" . implode(',', array_map('intval', $ids)) . ") OR ", $search, 1); /* dt_search_terms */
+}, 10, 2);
+
 /* ═════ תמונה לכרטיס בעמוד הטיפולים (נפרדת מהתמונה הראשית של עמוד הטיפול) ═════
    ריק = משתמשים בתמונה הראשית, כמו קודם. */
 function dt_card_image_id($post_id) {
