@@ -27,6 +27,14 @@ add_action('elementor/frontend/after_register_scripts', 'dts_register_widget_ass
 // נטען בכל עמוד (קטן): גם עמודים בלי ווידג'ט שלנו צריכים את הגלילה לעוגן אחרי טעינה (למשל החנות מהתפריט)
 add_action('wp_enqueue_scripts', function () { wp_enqueue_script('dt-widgets'); wp_enqueue_style('dt-widgets'); }, 20);
 
+/* הכפתורים בחלון העגלה: "לסל ההזמנה" ו"להמשך ההזמנה" במקום "מעבר לסל הקניות" ו"תשלום" (אין באתר תשלום) — לווידג'ט אין פקד לטקסט */
+add_filter('gettext', function ($t, $orig, $dom) { /* dt_cart_labels */
+    if ($dom !== 'woocommerce' || is_admin() && !wp_doing_ajax()) return $t;
+    if ($orig === 'View cart') return 'לסל ההזמנה';
+    if ($orig === 'Checkout') return 'להמשך ההזמנה';
+    return $t;
+}, 10, 3);
+
 /* חיפוש מוצרים גם לפי מותג וקטגוריה (למשל "bio" מחזיר את כל מוצרי Biofor) — לחיפוש של וורדפרס אין אפשרות כזו */
 add_filter('posts_search', function ($search, $q) {
     $s = trim((string) $q->get('s'));
