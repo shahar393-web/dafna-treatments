@@ -92,6 +92,13 @@ function dts_register_widget_assets() {
 .dfm.is-drag{touch-action:pan-y;cursor:grab;-webkit-user-select:none;user-select:none}
 .dfm.is-drag.is-down{cursor:grabbing}
 .dfm.is-drag img{-webkit-user-drag:none;pointer-events:none}
+.dfm.is-drag .dfm-set>*{transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.dfm.is-drag.is-down .dfm-set>*{transform:scale(.975)}
+.dfm-hint{position:absolute;direction:rtl;left:50%;bottom:14px;z-index:3;display:inline-flex;align-items:center;gap:6px;padding:7px 14px 7px 12px;border-radius:100px;background:rgba(46,42,36,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#F2F1EC;font-size:13px;line-height:1;letter-spacing:.04em;pointer-events:none;opacity:0;transform:translate(-50%,6px);transition:opacity .5s,transform .5s}
+.dfm-hint svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;animation:dfm-nudge 1.6s ease-in-out infinite}
+.dfm-hint.is-in{opacity:1;transform:translate(-50%,0)}
+.dfm-hint.is-gone{opacity:0;transform:translate(-50%,6px)}
+@keyframes dfm-nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(-3px)}}
 @media (prefers-reduced-motion:reduce){.dfm-track{animation:none}}
 /* מותגים */
 .dtb-logo{display:flex;align-items:center;justify-content:center;transition:opacity .3s;width:var(--dtb-w,auto);height:var(--dtb-h,40px)}
@@ -270,19 +277,30 @@ CSS);
      גרירה לא פותחת את הלייטבוקס — רק נגיעה קצרה */
   function drag(m){
     if(m._dg) return; m._dg=1; m.classList.add('is-drag');
-    var tr=m.querySelector('.dfm-track'), pos=0, last=0, down=false, px=0, lt=0, moved=0, v=0, sup=0;
+    var tr=m.querySelector('.dfm-track'), pos=0, last=0, down=false, px=0, lt=0, moved=0, v=0, sup=0, rel=-1e9, hint=null;
     var rev=m.getAttribute('data-dir')==='right', hov=window.matchMedia('(hover:hover)').matches&&m.classList.contains('is-pause');
     function W(){ var s=tr.querySelector('.dfm-set'); return s?s.getBoundingClientRect().width:0; }
     function step(t){ var w=W(), dt=last?Math.min(t-last,64):0; last=t;
       if(w){ var dur=parseFloat(getComputedStyle(m).getPropertyValue('--dfm-dur'))||40;
-        if(!down){ if(!(hov&&m.matches(':hover'))) pos+=(rev?1:-1)*w/dur*dt/1000; pos+=v*dt; v*=Math.pow(.94,dt/16); if(Math.abs(v)<.005) v=0; }
+        /* אחרי שחרור: קודם התנופה של האצבע, ואז התנועה הרגילה חוזרת בהדרגה (בלי קפיצה) */
+        var k=Math.min(1,Math.max(0,(t-rel-250)/900)); k=k*k*(3-2*k);
+        if(!down){ if(!(hov&&m.matches(':hover'))) pos+=(rev?1:-1)*w/dur*dt/1000*k; pos+=v*dt; v*=Math.pow(.955,dt/16); if(Math.abs(v)<.003) v=0; }
         pos=((pos%w)-w)%w; tr.style.transform='translate3d('+pos+'px,0,0)'; }
       requestAnimationFrame(step); }
     requestAnimationFrame(step);
+    /* אינדיקציה בטלפון: "החליקי" עם חצים, נעלמת במגע הראשון או אחרי כמה שניות */
+    if(window.matchMedia('(hover:none)').matches){
+      hint=document.createElement('span'); hint.className='dfm-hint'; hint.setAttribute('aria-hidden','true');
+      hint.innerHTML='<svg viewBox="0 0 24 24"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/></svg>החליקי';
+      m.appendChild(hint);
+      var hide=function(){ if(hint){ hint.classList.add('is-gone'); hint=null; } };
+      if('IntersectionObserver' in window){ var io=new IntersectionObserver(function(es){ if(es[0].isIntersecting){ io.disconnect(); setTimeout(function(){ if(hint) hint.classList.add('is-in'); },400); setTimeout(hide,4800); } },{threshold:.6}); io.observe(m); }
+      m.addEventListener('pointerdown',hide,{once:true});
+    }
     m.addEventListener('dragstart',function(e){ e.preventDefault(); });
     m.addEventListener('pointerdown',function(e){ if(e.button) return; down=true; px=e.clientX; lt=performance.now(); moved=0; v=0; m.classList.add('is-down'); });
-    window.addEventListener('pointermove',function(e){ if(!down) return; var dx=e.clientX-px, now=performance.now(); pos+=dx; moved+=Math.abs(dx); v=dx/Math.max(now-lt,8); px=e.clientX; lt=now; });
-    var up=function(){ if(!down) return; down=false; m.classList.remove('is-down'); if(performance.now()-lt>80) v=0; v=Math.max(-2,Math.min(2,v)); if(moved>6) sup=Date.now(); };
+    window.addEventListener('pointermove',function(e){ if(!down) return; var dx=e.clientX-px, now=performance.now(), nv=dx/Math.max(now-lt,8); pos+=dx; moved+=Math.abs(dx); v=v*.4+nv*.6; px=e.clientX; lt=now; },{passive:true});
+    var up=function(){ if(!down) return; down=false; rel=performance.now(); m.classList.remove('is-down'); if(rel-lt>90) v=0; v=Math.max(-3,Math.min(3,v)); if(moved>6) sup=Date.now(); };
     window.addEventListener('pointerup',up); window.addEventListener('pointercancel',up);
     m.addEventListener('click',function(e){ if(Date.now()-sup<400){ e.preventDefault(); e.stopPropagation(); } },true);
   }
